@@ -1,4 +1,55 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { JackpotData } from '@/types';
+
+/** Simulates a live jackpot counter that ticks up by small random increments */
+/**
+ * Simulates a live jackpot counter with intermittent ticking.
+ * Alternates between a burst of rapid increments and a pause.
+ */
+function useTickingAmount(baseAmount: number, burstMs = 80, maxStep = 50, pauseMs = 2000, burstCount = 6) {
+  const [display, setDisplay] = useState(baseAmount);
+  const amountRef = useRef(baseAmount);
+
+  useEffect(() => {
+    amountRef.current = baseAmount;
+    setDisplay(baseAmount);
+  }, [baseAmount]);
+
+  const scheduleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    let ticks = 0;
+
+    const tick = () => {
+      amountRef.current += Math.random() * maxStep + 1;
+      setDisplay(amountRef.current);
+      ticks++;
+
+      if (ticks < burstCount) {
+        // Continue burst
+        scheduleRef.current = setTimeout(tick, burstMs);
+      } else {
+        // Pause then start next burst
+        ticks = 0;
+        scheduleRef.current = setTimeout(tick, pauseMs + Math.random() * 1000);
+      }
+    };
+
+    // Start first burst after a short random delay
+    scheduleRef.current = setTimeout(tick, Math.random() * 500);
+
+    return () => { if (scheduleRef.current) clearTimeout(scheduleRef.current); };
+  }, [burstMs, maxStep, pauseMs, burstCount]);
+
+  return display;
+}
+
+function formatINR(amount: number, decimals = 0) {
+  return amount.toLocaleString('en-IN', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
 
 interface Props {
   data: JackpotData;
@@ -9,6 +60,11 @@ export default function JackpotSection({ data }: Props) {
   const dailyPot = data.pots.find((p) => p.type === 'daily_jackpot');
   const champion = data.last_champion;
   const currency = champion.currency || '\u20B9';
+
+  // burst of 5 ticks every ~2.5s, small increments
+  const vipDisplay = useTickingAmount(vipPot?.amount ?? 0, 100, 30, 2500, 5);
+  // burst of 6 ticks every ~2s, larger increments
+  const dailyDisplay = useTickingAmount(dailyPot?.amount ?? 0, 80, 70, 2000, 6);
 
   return (
     <div className="px-4 mt-4">
@@ -35,12 +91,16 @@ export default function JackpotSection({ data }: Props) {
           {vipPot?.countdown && (
             <div className="text-txt-muted text-2xs mt-1" style={{ animation: 'countdownPulse 1s ease-in-out infinite' }}>{vipPot.countdown}</div>
           )}
-          <div className="text-white font-extrabold text-lg mt-2">{currency}{(vipPot?.amount ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+          <div className="text-white font-extrabold text-lg mt-2 tabular-nums">
+            {currency}{formatINR(vipDisplay, 2)}
+          </div>
         </div>
         {/* Daily Jackpot */}
         <div className="flex-1 rounded-xl p-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1a3a1e 0%, #0d2a12 100%)' }}>
           <div className="text-brand text-xs font-semibold">{dailyPot?.label || 'Daily Jackpot'}</div>
-          <div className="text-white font-extrabold text-lg mt-2" style={{ animation: 'jackpotPulse 2s infinite' }}>{currency}{(dailyPot?.amount ?? 0).toLocaleString('en-IN')}</div>
+          <div className="text-white font-extrabold text-lg mt-2 tabular-nums">
+            {currency}{formatINR(dailyDisplay)}
+          </div>
           <div className="text-txt-secondary text-2xs mt-1">Winner</div>
           <img src="https://1goplus.com/png/trophy-B3u8sNrg-Bogwg3F_.png" alt="" className="absolute right-0 top-0 h-full opacity-30 pointer-events-none" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
         </div>

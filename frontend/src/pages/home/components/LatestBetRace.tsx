@@ -1,20 +1,58 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { LatestBetsData, BetRecord } from '@/types';
 
 const tabs = ['Latest Bet', 'High Roller', 'High Multiplier'] as const;
 type TabKey = 'latest_bet' | 'high_roller' | 'high_multiplier';
 const tabKeys: TabKey[] = ['latest_bet', 'high_roller', 'high_multiplier'];
 
+const ROW_HEIGHT = 48;
+const VISIBLE_ROWS = 7;
+const SPEED_PER_ROW = 1.5; // seconds per row scroll
+
 interface Props {
   data: LatestBetsData;
 }
 
+function BetRow({ row }: { row: BetRecord }) {
+  const isProfit = row.profit > 0;
+  const profitStr = isProfit
+    ? `+${row.currency || '\u20B9'} ${Math.abs(row.profit)}`
+    : row.profit === 0
+    ? '0'
+    : `-${row.currency || '\u20B9'} ${Math.abs(row.profit)}`;
+
+  return (
+    <div
+      className="grid items-center px-4 text-sm shrink-0"
+      style={{ gridTemplateColumns: '1fr 1fr auto', borderBottom: '1px solid #2A2D2D', height: `${ROW_HEIGHT}px` }}
+    >
+      <span className="text-white flex items-center gap-2">
+        <span className="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-2xs text-brand flex-shrink-0">
+          {row.game_initial}
+        </span>
+        <span className="truncate">{row.game}</span>
+      </span>
+      <span className="text-txt-secondary">{row.player}</span>
+      <span className={`text-right font-semibold ${isProfit ? 'text-brand' : 'text-txt-muted'}`}>
+        {profitStr}
+      </span>
+    </div>
+  );
+}
+
 export default function LatestBetRace({ data }: Props) {
   const [activeTab, setActiveTab] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const rows: BetRecord[] = data[tabKeys[activeTab]] ?? [];
 
   if (rows.length === 0 && activeTab === 0) return null;
+
+  const shouldScroll = rows.length > VISIBLE_ROWS;
+  // Duplicate the list for seamless loop
+  const scrollDuration = rows.length * SPEED_PER_ROW;
+  const totalHeight = rows.length * ROW_HEIGHT;
 
   return (
     <div className="px-4 mt-4">
@@ -48,34 +86,38 @@ export default function LatestBetRace({ data }: Props) {
         <span className="text-right">Profit</span>
       </div>
 
-      {/* Table Rows */}
-      {rows.map((row, i) => {
-        const isProfit = row.profit > 0;
-        const profitStr = isProfit
-          ? `+${row.currency || '\u20B9'} ${Math.abs(row.profit)}`
-          : row.profit === 0
-          ? '0'
-          : `-${row.currency || '\u20B9'} ${Math.abs(row.profit)}`;
-
-        return (
+      {/* Scrolling Table Body */}
+      <div
+        ref={containerRef}
+        style={{ height: `${ROW_HEIGHT * VISIBLE_ROWS}px`, overflow: 'hidden' }}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        {shouldScroll ? (
           <div
-            key={i}
-            className="grid items-center px-4 py-3 text-sm"
-            style={{ gridTemplateColumns: '1fr 1fr auto', borderBottom: '1px solid #2A2D2D' }}
+            className="bet-scroll-track"
+            style={{
+              animationDuration: `${scrollDuration}s`,
+              animationPlayState: paused ? 'paused' : 'running',
+              // Use CSS custom property for the scroll distance
+              ['--scroll-distance' as string]: `-${totalHeight}px`,
+            }}
           >
-            <span className="text-white flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-2xs text-brand flex-shrink-0">
-                {row.game_initial}
-              </span>
-              <span className="truncate">{row.game}</span>
-            </span>
-            <span className="text-txt-secondary">{row.player}</span>
-            <span className={`text-right font-semibold ${isProfit ? 'text-brand' : 'text-txt-muted'}`}>
-              {profitStr}
-            </span>
+            {/* Original list */}
+            {rows.map((row, i) => (
+              <BetRow key={`a-${i}`} row={row} />
+            ))}
+            {/* Duplicated list for seamless loop */}
+            {rows.map((row, i) => (
+              <BetRow key={`b-${i}`} row={row} />
+            ))}
           </div>
-        );
-      })}
+        ) : (
+          rows.map((row, i) => (
+            <BetRow key={i} row={row} />
+          ))
+        )}
+      </div>
     </div>
   );
 }

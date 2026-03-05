@@ -203,6 +203,15 @@ input::placeholder {
   0% { filter: hue-rotate(0deg); }
   100% { filter: hue-rotate(360deg); }
 }
+/* Latest Bet continuous vertical scroll */
+@keyframes betScrollUp {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(var(--scroll-distance)); }
+}
+.bet-scroll-track {
+  animation: betScrollUp linear infinite;
+}
+
 /* Hot Event icon pulse */
 @keyframes hotEventPulse {
   0%, 100% { transform: scale(1); }
