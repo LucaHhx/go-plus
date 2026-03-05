@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { JackpotData } from '@/types';
 
 /** Simulates a live jackpot counter that ticks up by small random increments */

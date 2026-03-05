@@ -43,7 +43,6 @@ export default function HomePage() {
     );
   }
 
-  const banners = homeData?.banners ?? [];
   const gameSections = homeData?.game_sections ?? [];
   const providers = homeData?.providers ?? [];
   const paymentIcons = homeData?.payment_icons ?? [];
