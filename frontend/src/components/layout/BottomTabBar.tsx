@@ -120,20 +120,17 @@ export default function BottomTabBar() {
                 style={{ marginTop: '-20px' }}
                 onClick={() => handleTabClick(tab)}
               >
-                <div
-                  className="flex items-center justify-center"
-                  style={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #24EE89, #9FE871)',
-                  }}
-                >
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#1A1D1D" stroke="none">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-                  </svg>
+                <div className="get1700-wrap">
+                  <img
+                    src="/assets/icons/get1700-wheel.png"
+                    alt="GET 1700"
+                  />
+                  <div className="get1700-bg" />
                 </div>
-                <span className="text-2xs font-semibold text-white" style={{ marginTop: '2px' }}>
+                <span
+                  className="text-2xs font-semibold text-white"
+                  style={{ marginTop: '-12px', position: 'relative', zIndex: 10 }}
+                >
                   GET <span style={{ color: '#24EE89' }}>{'\u20B9'}</span><span style={{ color: '#FFD700' }}>1700</span>
                 </span>
               </div>

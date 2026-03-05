@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { homeApi } from '@/api/home';
 import type { HomeData } from '@/types';
 import PromoBanner from './components/PromoBanner';
-import BannerCarousel from './components/BannerCarousel';
 import JackpotSection from './components/JackpotSection';
 import TrendingGames from './components/TrendingGames';
 import RecentBigWin from './components/RecentBigWin';
@@ -67,9 +66,6 @@ export default function HomePage() {
     <>
       {/* 1. Promotional sign-up banner */}
       <PromoBanner />
-
-      {/* Banner carousel (if banners exist) */}
-      {banners.length > 0 && <BannerCarousel banners={banners} />}
 
       {/* 2. Jackpot of the Day [mock] */}
       {jackpot && jackpot.pots.length > 0 && <JackpotSection data={jackpot} />}

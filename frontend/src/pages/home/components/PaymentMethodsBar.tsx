@@ -1,51 +1,5 @@
 import type { PaymentIcon } from '@/types';
 
-// Inline SVG components for payment icons (keyed by backend icon_url identifier)
-function UpiIcon() {
-  return (
-    <svg viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto">
-      <text x="0" y="18" fill="#fff" fontSize="16" fontWeight="700" fontFamily="Arial, sans-serif">UPI</text>
-    </svg>
-  );
-}
-
-function PaytmIcon() {
-  return (
-    <svg viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto">
-      <text x="0" y="18" fill="#00BAF2" fontSize="16" fontWeight="700" fontFamily="Arial, sans-serif">Paytm</text>
-    </svg>
-  );
-}
-
-function PhonePeIcon() {
-  return (
-    <svg viewBox="0 0 100 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto">
-      <text x="0" y="18" fill="#5F259F" fontSize="16" fontWeight="700" fontFamily="Arial, sans-serif">PhonePe</text>
-    </svg>
-  );
-}
-
-function GPayIcon() {
-  return (
-    <svg viewBox="0 0 70 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto">
-      <text x="0" y="18" fontSize="16" fontWeight="700" fontFamily="Arial, sans-serif">
-        <tspan fill="#4285F4">G</tspan>
-        <tspan fill="#EA4335">P</tspan>
-        <tspan fill="#FBBC04">a</tspan>
-        <tspan fill="#34A853">y</tspan>
-      </text>
-    </svg>
-  );
-}
-
-function ImpsIcon() {
-  return (
-    <svg viewBox="0 0 70 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto">
-      <text x="0" y="18" fill="#fff" fontSize="16" fontWeight="700" fontFamily="Arial, sans-serif">IMPS</text>
-    </svg>
-  );
-}
-
 function UsdtIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5">
@@ -58,13 +12,17 @@ function UsdtIcon() {
   );
 }
 
-const paymentIconMap: Record<string, React.FC> = {
-  upi: UpiIcon,
-  paytm: PaytmIcon,
-  phonepe: PhonePeIcon,
-  gpay: GPayIcon,
-  imps: ImpsIcon,
-  usdt: UsdtIcon,
+const paymentLabels: Record<string, { text: string; color: string } | { spans: { text: string; color: string }[] }> = {
+  upi: { text: 'UPI', color: '#fff' },
+  paytm: { text: 'Paytm', color: '#00BAF2' },
+  phonepe: { text: 'PhonePe', color: '#5F259F' },
+  gpay: { spans: [
+    { text: 'G', color: '#4285F4' },
+    { text: 'P', color: '#EA4335' },
+    { text: 'a', color: '#FBBC04' },
+    { text: 'y', color: '#34A853' },
+  ]},
+  imps: { text: 'IMPS', color: '#fff' },
 };
 
 interface Props {
@@ -78,17 +36,33 @@ export default function PaymentMethodsBar({ methods }: Props) {
     <div className="px-4 mt-6">
       <div className="flex items-center justify-center gap-4 py-3 rounded-lg" style={{ background: '#323738' }}>
         {methods.map((method) => {
-          const iconKey = method.icon_url.toLowerCase();
-          const IconComponent = paymentIconMap[iconKey];
+          const key = method.icon_url.toLowerCase();
+
+          if (key === 'usdt') {
+            return <UsdtIcon key={method.name} />;
+          }
+
+          const label = paymentLabels[key];
+          if (!label) {
+            return (
+              <span key={method.name} className="text-white text-sm font-bold">{method.name}</span>
+            );
+          }
+
+          if ('spans' in label) {
+            return (
+              <span key={method.name} className="text-sm font-bold">
+                {label.spans.map((s, i) => (
+                  <span key={i} style={{ color: s.color }}>{s.text}</span>
+                ))}
+              </span>
+            );
+          }
 
           return (
-            <div key={method.name} className="flex items-center gap-1.5">
-              {IconComponent ? (
-                <IconComponent />
-              ) : (
-                <span className="text-txt-secondary text-xs font-semibold">{method.name}</span>
-              )}
-            </div>
+            <span key={method.name} className="text-sm font-bold" style={{ color: label.color }}>
+              {label.text}
+            </span>
           );
         })}
       </div>

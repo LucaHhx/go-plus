@@ -203,7 +203,6 @@ input::placeholder {
   0% { filter: hue-rotate(0deg); }
   100% { filter: hue-rotate(360deg); }
 }
-
 /* Hot Event icon pulse */
 @keyframes hotEventPulse {
   0%, 100% { transform: scale(1); }
