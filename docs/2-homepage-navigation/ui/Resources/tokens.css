@@ -1,0 +1,132 @@
+/**
+ * Design Tokens -- GO PLUS Homepage & Navigation (Global Design System)
+ * 从 design.md 设计系统提取的 CSS 自定义属性
+ * 首页是全局设计系统的定义者，所有其他需求继承此文件
+ * 前端可直接引用，也可通过 Tailwind 配置使用
+ */
+
+:root {
+  /* ===== Colors: Background ===== */
+  --color-bg: #232626;              /* 页面主背景 */
+  --color-bg-deep: #1A1D1D;         /* 侧边菜单背景、body 背景 */
+  --color-bg-card: #2A2D2D;         /* 卡片背景 */
+  --color-bg-hover: #323738;        /* 悬浮/按钮底色、供应商格子 */
+  --color-bg-layer4: #323738;       /* 底部栏/头部背景 */
+  --color-bg-input: #1E2121;        /* 输入框背景 */
+
+  /* ===== Colors: Brand ===== */
+  --color-brand: #24EE89;           /* 品牌主色 (CTA、选中态、图标强调) */
+  --color-brand-dark: #1DBF6E;      /* 按钮 hover 态 */
+  --color-brand-end: #9FE871;       /* Sign Up 按钮渐变终点 */
+  --color-brand-light: rgba(36, 238, 137, 0.15); /* 品牌色透明背景 */
+
+  /* ===== Colors: Text ===== */
+  --color-txt: #FFFFFF;             /* 标题、重要文本 */
+  --color-txt-secondary: #B0B3B3;   /* 描述文字、placeholder */
+  --color-txt-muted: #6B7070;       /* 未选中 Tab、禁用态 */
+
+  /* ===== Colors: Semantic ===== */
+  --color-error: #FF4757;           /* 错误提示、Hot 标签 */
+  --color-warning: #FFA502;         /* 处理中状态 */
+  --color-divider: #3A3D3D;         /* 边框、分隔线 */
+  --color-overlay: rgba(0, 0, 0, 0.6); /* 侧边菜单遮罩 */
+
+  /* ===== Colors: Social Media ===== */
+  --color-telegram: #229ED9;
+  --color-facebook: #1877F2;
+  --color-instagram-start: #f09433;
+  --color-instagram-end: #bc1888;
+  --color-whatsapp: #25D366;
+  --color-youtube: #FF0000;
+
+  /* ===== Colors: GET 1700 ===== */
+  --color-get1700-base: rgb(1, 68, 28); /* GET 1700 底座 */
+  --color-gold: #FFD700;            /* 金色 (1700 数字、VIP 星星) */
+
+  /* ===== Typography ===== */
+  --font-family: 'AvertaStd', 'Inter', system-ui, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-extrabold: 800;
+  --font-size-2xs: 10px;            /* Tab 标签文字、角标 */
+  --font-size-xs: 12px;             /* 辅助说明、游戏名 */
+  --font-size-sm: 14px;             /* 正文、描述 */
+  --font-size-base: 16px;           /* 区块标题、Sign In/Up 按钮 */
+  --font-size-lg: 18px;             /* Jackpot 金额 */
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;            /* 100 Bonuses 文字 */
+
+  /* ===== Spacing ===== */
+  --spacing-xs: 4px;                /* 图标与文字间距 */
+  --spacing-sm: 8px;                /* 紧凑元素间距 */
+  --spacing-md: 12px;               /* 游戏图标网格 gap */
+  --spacing-base: 16px;             /* 页面水平内边距 px-4 */
+  --spacing-lg: 16px;               /* 区块间距 mt-4 */
+  --spacing-xl: 24px;               /* 大区块间距 mt-6 */
+
+  /* ===== Border Radius ===== */
+  --radius-xs: 4px;                 /* Hot/New 标签 */
+  --radius-sm: 8px;                 /* 按钮、输入框、游戏缩略图、供应商格子 */
+  --radius-md: 12px;                /* 卡片、Banner */
+  --radius-full: 9999px;            /* 头像、GET1700 */
+
+  /* ===== Shadows ===== */
+  /* 深色主题不使用明显阴影，靠背景色层次区分 */
+  --shadow-none: none;
+
+  /* ===== Layout ===== */
+  --max-width-mobile: 430px;
+  --header-height: 56px;
+  --header-bg: rgba(50, 55, 56, 0.85);
+  --header-blur: blur(10px);
+  --tabbar-height: 64px;
+  --tabbar-bg: #323738;
+  --sidebar-width: 280px;
+  --sidebar-bg: #1A1D1D;
+
+  /* ===== Z-Index ===== */
+  --z-header: 1000;
+  --z-sidebar-overlay: 1001;
+  --z-sidebar-panel: 1002;
+  --z-tabbar: 999;
+
+  /* ===== Component: Button ===== */
+  --btn-signup-bg: linear-gradient(90deg, var(--color-brand), var(--color-brand-end));
+  --btn-signup-color: #000000;
+  --btn-signup-height: 40px;
+  --btn-signup-font-size: var(--font-size-base);
+  --btn-signup-font-weight: var(--font-weight-extrabold);
+  --btn-signup-radius: var(--radius-sm);
+
+  --btn-primary-bg: var(--color-brand);
+  --btn-primary-color: #000000;
+
+  --btn-secondary-bg: var(--color-bg-hover);
+  --btn-secondary-color: var(--color-txt);
+
+  /* ===== Component: Game Icon Card (56px grid) ===== */
+  --game-icon-size: 56px;
+  --game-icon-radius: var(--radius-sm);
+  --game-icon-gap: var(--spacing-md);
+  --game-icon-name-size: var(--font-size-2xs);
+  --game-icon-name-color: var(--color-txt-secondary);
+
+  /* ===== Component: Trending Card ===== */
+  --trending-card-width: 142px;
+  --trending-thumb-height: 96px;
+
+  /* ===== Component: Supplier Grid ===== */
+  --supplier-cols: 4;
+  --supplier-item-height: 44px;
+  --supplier-item-bg: var(--color-bg-hover);
+  --supplier-item-radius: var(--radius-sm);
+
+  /* ===== Component: Sidebar Menu Item ===== */
+  --sidebar-item-icon-size: 24px;
+  --sidebar-item-font-size: var(--font-size-sm);
+  --sidebar-item-padding: 12px 16px;
+
+  /* ===== Animation ===== */
+  --transition-sidebar: transform 0.3s ease-out;
+  --transition-overlay: opacity 0.3s;
+}

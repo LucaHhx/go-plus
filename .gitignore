@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+
+# Go binary
+server/server
+
+# Database
+server/data/
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+server/logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.sw?
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.DS_Store
+
+# Local env
+*.local
+
+# Test
+test-results/
+
+# Misc
+img.png

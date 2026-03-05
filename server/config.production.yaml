@@ -1,0 +1,22 @@
+server:
+  port: 8080
+  mode: release
+
+database:
+  path: ./data/go-plus.db
+
+jwt:
+  secret: go-plus-jwt-secret-key-change-in-production
+  expire_hours: 24
+
+otp:
+  expire_minutes: 5
+  mock: true
+  fixed_code: "123456"
+
+google:
+  mock: true
+
+log:
+  level: info
+  file: ./logs/app.log

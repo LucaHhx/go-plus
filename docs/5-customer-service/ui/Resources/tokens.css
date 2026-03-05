@@ -1,0 +1,22 @@
+/**
+ * Design Tokens -- GO PLUS 客服系统
+ * 继承全局设计系统 (docs/2-homepage-navigation/ui/Resources/tokens.css)
+ * 此文件仅包含客服模块的特有 tokens
+ */
+
+:root {
+  /* ===== 客服特有色值 ===== */
+  --color-chat-user-bubble: #24EE89;      /* 用户消息气泡背景 */
+  --color-chat-agent-bubble: #2A2D2D;     /* 客服消息气泡背景 (与 merge.html bg-card 一致) */
+  --color-chat-user-text: #1A1D1D;        /* 用户消息文字 (深色, 与 ui/design.md 一致) */
+  --color-chat-agent-text: #FFFFFF;       /* 客服消息文字 */
+  --color-chat-input-bg: #2A2D2D;         /* 聊天输入框背景 (与 merge.html bg-card 一致) */
+  --color-online: #24EE89;                /* 在线状态指示 */
+  --color-offline: #6B7070;               /* 离线状态指示 */
+
+  /* ===== 组件: 聊天窗口 ===== */
+  --chat-header-height: 56px;
+  --chat-input-height: 56px;
+  --chat-bubble-radius: 12px;
+  --chat-bubble-max-width: 280px;
+}

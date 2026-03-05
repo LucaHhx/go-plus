@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GO PLUS - Game Lobby (Explore / ALL GAMES)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: { DEFAULT: '#232626', deep: '#1A1D1D', card: '#2A2D2D', hover: '#323738', input: '#1E2020' },
+            brand: { DEFAULT: '#24EE89', dark: '#1DBF6E', end: '#9FE871' },
+            txt: { DEFAULT: '#FFFFFF', secondary: '#B0B3B3', muted: '#6B7070' },
+            divider: '#3A4142',
+            error: '#FF4757',
+            favourite: '#FF4757',
+          },
+          fontFamily: { sans: ['AvertaStd', 'Inter', 'system-ui', 'sans-serif'] },
+          maxWidth: { mobile: '430px' },
+          fontSize: { '2xs': '10px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1A1D1D; font-family: 'AvertaStd', 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Search input */
+    .search-box {
+      display: flex; align-items: center;
+      background: #1E2020; border: 1px solid #3A4142;
+      border-radius: 8px; height: 44px; padding: 0 12px; gap: 8px;
+    }
+    .search-box:focus-within { border-color: #24EE89; }
+    .search-box input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: #fff; font-size: 14px;
+    }
+    .search-box input::placeholder { color: #6B7070; }
+
+    /* Filter chip */
+    .filter-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 6px 12px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      white-space: nowrap; background: transparent;
+      color: #B0B3B3; border: none;
+    }
+    .filter-chip.active { background: #3A4142; color: #fff; }
+    .filter-chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+    /* Dropdown select */
+    .filter-select {
+      display: flex; align-items: center; gap: 4px;
+      padding: 8px 12px; border: 1px solid #3A4142;
+      border-radius: 8px; background: transparent;
+      color: #B0B3B3; font-size: 12px; cursor: pointer; flex: 1;
+    }
+    .filter-select .value { color: #fff; font-weight: 600; }
+
+    /* Game card */
+    .game-card { cursor: pointer; position: relative; }
+    .game-card .thumb {
+      width: 100%; aspect-ratio: 1; border-radius: 8px;
+      object-fit: cover; transition: transform 0.2s; position: relative; overflow: hidden;
+    }
+    .game-card:hover .thumb { transform: scale(1.05); }
+    .game-card .game-name {
+      font-size: 12px; color: #fff; margin-top: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .game-card .provider-name { font-size: 10px; color: #6B7070; }
+
+    /* Game placeholder thumbnail */
+    .game-placeholder {
+      width: 100%; aspect-ratio: 1; border-radius: 8px;
+      background: #2A2D2D; display: flex; align-items: center;
+      justify-content: center; position: relative; overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .game-card:hover .game-placeholder { transform: scale(1.05); }
+    .game-placeholder .initials {
+      font-size: 20px; font-weight: 800; color: #6B7070; text-transform: uppercase;
+    }
+
+    /* New badge */
+    .new-badge {
+      position: absolute; top: 6px; left: 6px; z-index: 10;
+      background: #24EE89; color: #1A1D1D;
+      font-size: 8px; font-weight: 700; padding: 2px 6px;
+      border-radius: 4px; line-height: 1.2;
+    }
+
+    /* Favourite button */
+    .fav-btn {
+      position: absolute; top: 6px; right: 6px; z-index: 10;
+      background: rgba(0,0,0,0.4); border: none; cursor: pointer;
+      border-radius: 50%; width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Page header */
+    .page-header {
+      display: flex; align-items: center; justify-content: center;
+      height: 56px; padding: 0 16px; position: relative; background: #232626;
+    }
+    .page-header .back-btn {
+      position: absolute; left: 16px; background: none;
+      border: none; color: #fff; cursor: pointer; padding: 8px;
+    }
+    .page-header .search-btn {
+      position: absolute; right: 16px; background: none;
+      border: none; color: #24EE89; cursor: pointer; padding: 8px;
+    }
+    .page-header .title { font-size: 16px; font-weight: 800; color: #fff; }
+
+    /* Bottom tab bar */
+    .tab-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      max-width: 430px; margin: 0 auto; height: 64px;
+      background: #323738; z-index: 999;
+      display: flex; align-items: flex-end; justify-content: space-around;
+      padding: 0 8px 4px;
+    }
+    .tab-item {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; cursor: pointer; padding-top: 4px;
+    }
+    .tab-item span { font-size: 10px; font-weight: 600; margin-top: 2px; }
+    .tab-inactive { color: #6B7070; }
+    .tab-active { color: #24EE89; }
+
+    /* Provider logo button */
+    .provider-btn {
+      display: flex; align-items: center; justify-content: center;
+      background: #2A2D2D; border-radius: 8px; padding: 10px 8px;
+      cursor: pointer; transition: background 0.2s; min-height: 44px;
+    }
+    .provider-btn:hover { background: #323738; }
+    .provider-btn span {
+      font-size: 10px; font-weight: 600; color: #B0B3B3;
+      text-align: center; line-height: 1.2;
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 48px 16px; gap: 12px;
+    }
+    .empty-state .icon { color: #6B7070; }
+    .empty-state .title-text { font-size: 16px; font-weight: 600; color: #B0B3B3; }
+    .empty-state .subtitle-text { font-size: 13px; color: #6B7070; text-align: center; }
+
+    /* Skeleton loader */
+    .skeleton {
+      background: #2A2D2D; border-radius: 8px; position: relative; overflow: hidden;
+    }
+    .skeleton::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+    /* Section divider */
+    .section-label {
+      font-size: 13px; font-weight: 700; color: #B0B3B3;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 16px 0 8px;
+    }
+
+    /* State toggle buttons (for demo) */
+    .state-toggle {
+      display: flex; gap: 6px; padding: 12px 16px;
+      background: #1A1D1D; border-bottom: 1px solid #3A4142;
+      overflow-x: auto; position: sticky; top: 0; z-index: 100;
+    }
+    .state-toggle button {
+      padding: 4px 10px; border-radius: 6px; border: 1px solid #3A4142;
+      background: transparent; color: #B0B3B3; font-size: 11px;
+      cursor: pointer; white-space: nowrap; font-weight: 600;
+    }
+    .state-toggle button.active { background: #24EE89; color: #1A1D1D; border-color: #24EE89; }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- DESIGN MOCKUP NAVIGATION (for preview only, not part of UI)  -->
+<!-- ============================================================ -->
+<div class="state-toggle hide-scrollbar">
+  <button class="active" onclick="showState('normal')">Normal</button>
+  <button onclick="showState('empty-fav')">Empty: My Fav</button>
+  <button onclick="showState('empty-recent')">Empty: Recent</button>
+  <button onclick="showState('empty-search')">Empty: Search</button>
+  <button onclick="showState('loading')">Loading</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- STATE: NORMAL - Explore Page with Games                      -->
+<!-- ============================================================ -->
+<div id="state-normal" class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+  <!-- Page Header: ALL GAMES -->
+  <div class="page-header sticky top-0 z-50">
+    <button class="back-btn">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <span class="title">ALL GAMES</span>
+    <button class="search-btn">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="px-4 pb-20">
+
+    <!-- Search Box -->
+    <div class="search-box mt-3">
+      <svg class="w-5 h-5 text-txt-muted flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input type="text" placeholder="Search games">
+    </div>
+
+    <!-- Filter Chips (Category Tabs) - All 10 tabs -->
+    <div class="flex gap-2 mt-3 overflow-x-auto hide-scrollbar">
+      <!-- All Games (active) -->
+      <button class="filter-chip active">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        All Games
+      </button>
+      <!-- New -->
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        New
+      </button>
+      <!-- Recent -->
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Recent
+      </button>
+      <!-- My Fav -->
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        My Fav
+      </button>
+      <!-- Slots -->
+      <button class="filter-chip">Slots</button>
+      <!-- Live -->
+      <button class="filter-chip">Live</button>
+      <!-- Crash -->
+      <button class="filter-chip">Crash</button>
+      <!-- Table Game -->
+      <button class="filter-chip">Table Game</button>
+      <!-- Fishing -->
+      <button class="filter-chip">Fishing</button>
+      <!-- Lotto -->
+      <button class="filter-chip">Lotto</button>
+    </div>
+
+    <!-- Filter Dropdowns -->
+    <div class="flex gap-2 mt-3">
+      <div class="filter-select">
+        <span>Type:</span>
+        <span class="value">ALL</span>
+        <svg class="w-3 h-3 ml-auto text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="filter-select">
+        <span>Providers:</span>
+        <span class="value">ALL</span>
+        <svg class="w-3 h-3 ml-auto text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+    </div>
+
+    <!-- Game Grid (3 columns) -->
+    <div class="grid grid-cols-3 gap-x-2 gap-y-3 mt-4">
+
+      <!-- Card 1: Aviator (with NEW badge) -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <span class="new-badge">NEW</span>
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">AV</span>
+        </div>
+        <div class="game-name">Aviator</div>
+        <div class="provider-name">Spribe</div>
+      </div>
+
+      <!-- Card 2: Pappu -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">PA</span>
+        </div>
+        <div class="game-name">Pappu</div>
+        <div class="provider-name">JILI</div>
+      </div>
+
+      <!-- Card 3: 7 UP 7 DOWN -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">7U</span>
+        </div>
+        <div class="game-name">7 UP 7 DOWN</div>
+        <div class="provider-name">JILI</div>
+      </div>
+
+      <!-- Card 4: Fortune Gems 3 (with NEW badge, favourited) -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <span class="new-badge">NEW</span>
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="#FF4757" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">FG</span>
+        </div>
+        <div class="game-name">Fortune Gems 3</div>
+        <div class="provider-name">JILI</div>
+      </div>
+
+      <!-- Card 5: Piggy Bank -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">PB</span>
+        </div>
+        <div class="game-name">Piggy Bank</div>
+        <div class="provider-name">JDB</div>
+      </div>
+
+      <!-- Card 6: Jhandi Munda -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">JM</span>
+        </div>
+        <div class="game-name">Jhandi Munda</div>
+        <div class="provider-name">JILI</div>
+      </div>
+
+      <!-- Card 7: Crazy Time -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">CT</span>
+        </div>
+        <div class="game-name">Crazy Time</div>
+        <div class="provider-name">Evolution</div>
+      </div>
+
+      <!-- Card 8: Playtech Live -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">PL</span>
+        </div>
+        <div class="game-name">Playtech Live</div>
+        <div class="provider-name">Playtech</div>
+      </div>
+
+      <!-- Card 9: Cash Mania (NEW) -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <span class="new-badge">NEW</span>
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">CM</span>
+        </div>
+        <div class="game-name">Cash Mania</div>
+        <div class="provider-name">JILI</div>
+      </div>
+
+      <!-- Card 10: Ganesha Gold -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">GG</span>
+        </div>
+        <div class="game-name">Ganesha Gold</div>
+        <div class="provider-name">JILI</div>
+      </div>
+
+      <!-- Card 11: Roulette -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">RL</span>
+        </div>
+        <div class="game-name">European Roulette</div>
+        <div class="provider-name">Evolution</div>
+      </div>
+
+      <!-- Card 12: Super Ace -->
+      <div class="game-card">
+        <div class="game-placeholder">
+          <button class="fav-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <span class="initials">SA</span>
+        </div>
+        <div class="game-name">Super Ace</div>
+        <div class="provider-name">JILI</div>
+      </div>
+
+    </div>
+
+    <!-- Load More indicator -->
+    <div class="mt-6 text-center">
+      <div class="inline-flex items-center gap-2 text-txt-muted text-sm">
+        <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" stroke-opacity="0.3"/>
+          <path d="M12 2a10 10 0 019.95 9"/>
+        </svg>
+        Loading more games...
+      </div>
+    </div>
+
+    <!-- Provider Logo Section -->
+    <div class="section-label mt-6">Game Providers</div>
+    <div class="grid grid-cols-4 gap-2 mt-2">
+      <div class="provider-btn"><span>JILI</span></div>
+      <div class="provider-btn"><span>Spribe</span></div>
+      <div class="provider-btn"><span>JDB</span></div>
+      <div class="provider-btn"><span>Evolution</span></div>
+      <div class="provider-btn"><span>INOUT</span></div>
+      <div class="provider-btn"><span>Hacksaw</span></div>
+      <div class="provider-btn"><span>PG</span></div>
+      <div class="provider-btn"><span>Playtech</span></div>
+      <div class="provider-btn"><span>Turbo<br>Games</span></div>
+      <div class="provider-btn"><span>MG</span></div>
+      <div class="provider-btn"><span>Habanero</span></div>
+      <div class="provider-btn"><span>SA<br>Gaming</span></div>
+      <div class="provider-btn"><span>NetEnt</span></div>
+      <div class="provider-btn"><span>Nolimit<br>City</span></div>
+      <div class="provider-btn"><span>Red<br>Tiger</span></div>
+      <div class="provider-btn"><span>Big Time<br>Gaming</span></div>
+      <div class="provider-btn"><span>TAP-A-<br>ROO</span></div>
+      <div class="provider-btn"><span>Ezugi</span></div>
+      <div class="provider-btn"><span>EENI</span></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Tab Bar -->
+  <div class="tab-bar">
+    <div class="tab-item tab-inactive">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span>Menu</span>
+    </div>
+    <div class="tab-item tab-active">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <span>Explore</span>
+    </div>
+    <!-- Center tab: GET 1700 placeholder -->
+    <div class="tab-item" style="margin-top: -16px;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #24EE89, #9FE871); display: flex; align-items: center; justify-content: center;">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="#1A1D1D" stroke="none">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+      </div>
+      <span class="text-white" style="font-size: 10px; font-weight: 600;">
+        GET <span style="color: #24EE89;">&#8377;</span><span style="color: #FFD700;">1700</span>
+      </span>
+    </div>
+    <div class="tab-item tab-inactive">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 8h8v2H8zm0 4h5v2H8z"/></svg>
+      <span>Raffle</span>
+    </div>
+    <div class="tab-item tab-inactive">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15l-3-3h6l-3 3z"/><circle cx="12" cy="12" r="10"/></svg>
+      <span>Quest</span>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ============================================================ -->
+<!-- STATE: EMPTY - My Fav (no favourites)                        -->
+<!-- ============================================================ -->
+<div id="state-empty-fav" class="max-w-mobile mx-auto min-h-screen bg-bg" style="display: none;">
+
+  <div class="page-header sticky top-0 z-50">
+    <button class="back-btn">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <span class="title">ALL GAMES</span>
+    <button class="search-btn">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="px-4 pb-20">
+    <div class="search-box mt-3">
+      <svg class="w-5 h-5 text-txt-muted flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input type="text" placeholder="Search games">
+    </div>
+
+    <!-- Tabs with My Fav active -->
+    <div class="flex gap-2 mt-3 overflow-x-auto hide-scrollbar">
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        All Games
+      </button>
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        New
+      </button>
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Recent
+      </button>
+      <button class="filter-chip active">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        My Fav
+      </button>
+      <button class="filter-chip">Slots</button>
+      <button class="filter-chip">Live</button>
+      <button class="filter-chip">Crash</button>
+      <button class="filter-chip">Table Game</button>
+      <button class="filter-chip">Fishing</button>
+      <button class="filter-chip">Lotto</button>
+    </div>
+
+    <!-- Empty State: My Fav -->
+    <div class="empty-state">
+      <svg class="icon w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      <div class="title-text">No favourite games yet</div>
+      <div class="subtitle-text">Browse games to add favourites</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- STATE: EMPTY - Recent (no history)                           -->
+<!-- ============================================================ -->
+<div id="state-empty-recent" class="max-w-mobile mx-auto min-h-screen bg-bg" style="display: none;">
+
+  <div class="page-header sticky top-0 z-50">
+    <button class="back-btn">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <span class="title">ALL GAMES</span>
+    <button class="search-btn">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="px-4 pb-20">
+    <div class="search-box mt-3">
+      <svg class="w-5 h-5 text-txt-muted flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input type="text" placeholder="Search games">
+    </div>
+
+    <!-- Tabs with Recent active -->
+    <div class="flex gap-2 mt-3 overflow-x-auto hide-scrollbar">
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        All Games
+      </button>
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        New
+      </button>
+      <button class="filter-chip active">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Recent
+      </button>
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        My Fav
+      </button>
+      <button class="filter-chip">Slots</button>
+      <button class="filter-chip">Live</button>
+      <button class="filter-chip">Crash</button>
+      <button class="filter-chip">Table Game</button>
+      <button class="filter-chip">Fishing</button>
+      <button class="filter-chip">Lotto</button>
+    </div>
+
+    <!-- Empty State: Recent -->
+    <div class="empty-state">
+      <svg class="icon w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <div class="title-text">No recently played games</div>
+      <div class="subtitle-text">Start playing to see your history here</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- STATE: EMPTY - Search no results                             -->
+<!-- ============================================================ -->
+<div id="state-empty-search" class="max-w-mobile mx-auto min-h-screen bg-bg" style="display: none;">
+
+  <div class="page-header sticky top-0 z-50">
+    <button class="back-btn">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <span class="title">ALL GAMES</span>
+    <button class="search-btn">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="px-4 pb-20">
+    <!-- Search box with text -->
+    <div class="search-box mt-3" style="border-color: #24EE89;">
+      <svg class="w-5 h-5 text-txt-muted flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input type="text" placeholder="Search games" value="xyzgame123">
+      <button style="background: none; border: none; cursor: pointer; padding: 4px;">
+        <svg class="w-4 h-4 text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Tabs (All Games active) -->
+    <div class="flex gap-2 mt-3 overflow-x-auto hide-scrollbar">
+      <button class="filter-chip active">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        All Games
+      </button>
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        New
+      </button>
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Recent
+      </button>
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        My Fav
+      </button>
+      <button class="filter-chip">Slots</button>
+      <button class="filter-chip">Live</button>
+      <button class="filter-chip">Crash</button>
+      <button class="filter-chip">Table Game</button>
+      <button class="filter-chip">Fishing</button>
+      <button class="filter-chip">Lotto</button>
+    </div>
+
+    <!-- Empty State: Search -->
+    <div class="empty-state">
+      <svg class="icon w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <div class="title-text">No games found</div>
+      <div class="subtitle-text">Try a different search term</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- STATE: LOADING - Skeleton screen                             -->
+<!-- ============================================================ -->
+<div id="state-loading" class="max-w-mobile mx-auto min-h-screen bg-bg" style="display: none;">
+
+  <div class="page-header sticky top-0 z-50">
+    <button class="back-btn">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <span class="title">ALL GAMES</span>
+    <button class="search-btn">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="px-4 pb-20">
+    <div class="search-box mt-3">
+      <svg class="w-5 h-5 text-txt-muted flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input type="text" placeholder="Search games">
+    </div>
+
+    <div class="flex gap-2 mt-3 overflow-x-auto hide-scrollbar">
+      <button class="filter-chip active">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        All Games
+      </button>
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        New
+      </button>
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Recent
+      </button>
+      <button class="filter-chip">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        My Fav
+      </button>
+      <button class="filter-chip">Slots</button>
+      <button class="filter-chip">Live</button>
+    </div>
+
+    <div class="flex gap-2 mt-3">
+      <div class="filter-select">
+        <span>Type:</span>
+        <span class="value">ALL</span>
+        <svg class="w-3 h-3 ml-auto text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="filter-select">
+        <span>Providers:</span>
+        <span class="value">ALL</span>
+        <svg class="w-3 h-3 ml-auto text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+    </div>
+
+    <!-- Skeleton Grid -->
+    <div class="grid grid-cols-3 gap-x-2 gap-y-3 mt-4">
+      <div>
+        <div class="skeleton" style="aspect-ratio: 1;"></div>
+        <div class="skeleton mt-1" style="height: 12px; width: 80%;"></div>
+        <div class="skeleton mt-1" style="height: 10px; width: 50%;"></div>
+      </div>
+      <div>
+        <div class="skeleton" style="aspect-ratio: 1;"></div>
+        <div class="skeleton mt-1" style="height: 12px; width: 70%;"></div>
+        <div class="skeleton mt-1" style="height: 10px; width: 40%;"></div>
+      </div>
+      <div>
+        <div class="skeleton" style="aspect-ratio: 1;"></div>
+        <div class="skeleton mt-1" style="height: 12px; width: 90%;"></div>
+        <div class="skeleton mt-1" style="height: 10px; width: 60%;"></div>
+      </div>
+      <div>
+        <div class="skeleton" style="aspect-ratio: 1;"></div>
+        <div class="skeleton mt-1" style="height: 12px; width: 65%;"></div>
+        <div class="skeleton mt-1" style="height: 10px; width: 45%;"></div>
+      </div>
+      <div>
+        <div class="skeleton" style="aspect-ratio: 1;"></div>
+        <div class="skeleton mt-1" style="height: 12px; width: 85%;"></div>
+        <div class="skeleton mt-1" style="height: 10px; width: 55%;"></div>
+      </div>
+      <div>
+        <div class="skeleton" style="aspect-ratio: 1;"></div>
+        <div class="skeleton mt-1" style="height: 12px; width: 75%;"></div>
+        <div class="skeleton mt-1" style="height: 10px; width: 50%;"></div>
+      </div>
+      <div>
+        <div class="skeleton" style="aspect-ratio: 1;"></div>
+        <div class="skeleton mt-1" style="height: 12px; width: 80%;"></div>
+        <div class="skeleton mt-1" style="height: 10px; width: 40%;"></div>
+      </div>
+      <div>
+        <div class="skeleton" style="aspect-ratio: 1;"></div>
+        <div class="skeleton mt-1" style="height: 12px; width: 60%;"></div>
+        <div class="skeleton mt-1" style="height: 10px; width: 50%;"></div>
+      </div>
+      <div>
+        <div class="skeleton" style="aspect-ratio: 1;"></div>
+        <div class="skeleton mt-1" style="height: 12px; width: 70%;"></div>
+        <div class="skeleton mt-1" style="height: 10px; width: 55%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- State toggle script -->
+<script>
+  function showState(state) {
+    document.querySelectorAll('[id^="state-"]').forEach(el => el.style.display = 'none');
+    document.getElementById('state-' + state).style.display = '';
+    document.querySelectorAll('.state-toggle button').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

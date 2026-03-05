@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GO PLUS - User System Design (Sign Up / Sign In / OTP Login)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: { DEFAULT: '#232626', deep: '#1A1D1D', card: '#2A2D2D', hover: '#323738', input: '#1E2121' },
+            brand: { DEFAULT: '#24EE89', dark: '#1DBF6E', end: '#9FE871' },
+            txt: { DEFAULT: '#FFFFFF', secondary: '#B0B3B3', muted: '#6B7070' },
+            divider: '#3A4142',
+            error: '#FF4757',
+          },
+          fontFamily: { sans: ['AvertaStd', 'Inter', 'system-ui', 'sans-serif'] },
+          maxWidth: { mobile: '430px' },
+          fontSize: { '2xs': '10px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* ===== Reset ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1A1D1D; font-family: 'AvertaStd', 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+    /* ===== Preview Tab Switcher (design review only, not part of actual UI) ===== */
+    .preview-tabs { position: sticky; top: 0; z-index: 9999; background: #111; padding: 8px 16px; display: flex; gap: 8px; justify-content: center; border-bottom: 1px solid #333; }
+    .preview-tab { padding: 6px 16px; border-radius: 6px; background: #333; color: #B0B3B3; cursor: pointer; font-size: 13px; font-weight: 600; border: none; }
+    .preview-tab.active { background: #24EE89; color: #1A1D1D; }
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    /* ===== Header ===== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 56px;
+      background: rgba(50, 55, 56, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+    }
+
+    /* ===== Banner ===== */
+    .auth-banner {
+      background: linear-gradient(180deg, #1a3a1e 0%, #0d2a12 40%, #232626 100%);
+      position: relative;
+      overflow: hidden;
+      padding: 16px 16px 32px;
+    }
+    .auth-banner-signin {
+      padding: 16px 16px 24px;
+    }
+
+    /* ===== Form Input ===== */
+    .form-input {
+      display: flex;
+      align-items: center;
+      background: #1E2121;
+      border: 1px solid #3A4142;
+      border-radius: 8px;
+      height: 48px;
+      padding: 0 12px;
+      transition: border-color 0.2s ease;
+    }
+    .form-input:focus-within {
+      border-color: #24EE89;
+    }
+    .form-input input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 14px;
+      line-height: 48px;
+      height: 100%;
+    }
+    .form-input input::placeholder { color: #6B7070; }
+    .form-input .prefix {
+      color: #B0B3B3;
+      font-size: 14px;
+      font-weight: 600;
+      margin-right: 12px;
+      padding-right: 12px;
+      border-right: 1px solid #3A4142;
+      white-space: nowrap;
+      line-height: 48px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+    }
+    .form-input .icon-btn {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #6B7070;
+    }
+
+    /* ===== Error State ===== */
+    .form-input.error {
+      border-color: #FF4757;
+    }
+    .error-text {
+      color: #FF4757;
+      font-size: 12px;
+      margin-top: 4px;
+      padding-left: 2px;
+    }
+
+    /* ===== Primary Button (gradient) ===== */
+    .btn-primary {
+      width: 100%;
+      height: 48px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #24EE89, #9FE871);
+      color: #000;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 0.5px;
+    }
+    .btn-primary:active { opacity: 0.9; }
+
+    /* ===== Google Button ===== */
+    .btn-google {
+      width: 100%;
+      height: 48px;
+      border: 1px solid #3A4142;
+      border-radius: 8px;
+      background: transparent;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-google:active { background: rgba(255,255,255,0.05); }
+
+    /* ===== OTP Button ===== */
+    .btn-otp {
+      color: #24EE89;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      background: transparent;
+      border: none;
+      padding: 0 4px;
+    }
+
+    /* ===== Gift Card ===== */
+    .gift-card {
+      background: #323738;
+      border-radius: 8px;
+      padding: 10px 8px 8px;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      flex: 1;
+      min-width: 0;
+    }
+    .gift-card.selected { border-color: #24EE89; }
+    .gift-card .thumb {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 6px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #1A1D1D;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gift-card .amount { color: #24EE89; font-size: 14px; font-weight: 800; }
+    .gift-card .label { color: #B0B3B3; font-size: 10px; margin-top: 2px; }
+    .gift-card .badge {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .gift-card .badge-active { background: #24EE89; color: #000; }
+    .gift-card .badge-inactive { background: #3A4142; color: #6B7070; }
+
+    /* ===== Custom Checkbox ===== */
+    .custom-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .custom-check.checked { background: #24EE89; }
+    .custom-check.unchecked { background: transparent; border: 1.5px solid #3A4142; }
+    .custom-check svg { width: 12px; height: 12px; }
+
+    /* ===== Tab Switcher (Sign In) ===== */
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid #3A4142;
+    }
+    .auth-tab {
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      color: #6B7070;
+    }
+    .auth-tab.active { color: #24EE89; border-bottom-color: #24EE89; }
+
+    /* ===== Annotation Layer (design notes visible on hover) ===== */
+    .annotation {
+      position: relative;
+    }
+    .annotation::after {
+      content: attr(data-note);
+      position: absolute;
+      top: -24px;
+      left: 0;
+      background: #FF4757;
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 100;
+    }
+    .annotation:hover::after { opacity: 1; }
+
+    /* ===== Loading State ===== */
+    .btn-primary.loading {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- ==================================================================
+     PREVIEW TAB SWITCHER (for design review only)
+     ================================================================== -->
+<div class="preview-tabs">
+  <button class="preview-tab active" onclick="showPage('signup')">Sign Up</button>
+  <button class="preview-tab" onclick="showPage('signin-password')">Sign In (Password)</button>
+  <button class="preview-tab" onclick="showPage('signin-otp')">Sign In (OTP)</button>
+  <button class="preview-tab" onclick="showPage('signup-error')">Sign Up (Error)</button>
+  <button class="preview-tab" onclick="showPage('signup-loading')">Sign Up (Loading)</button>
+</div>
+
+<!-- ==================================================================
+     PAGE 1: SIGN UP (Registration) -- Normal State
+     ==================================================================
+     Layout: Full-screen immersive, no global nav bar / bottom tabs.
+     Max-width 430px centered. All padding 16px horizontal.
+     ================================================================== -->
+<div id="page-signup" class="page-section active">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <!-- Header: height 56px, glassmorphism bg -->
+    <header class="app-header">
+      <!-- LOGO: 纯文字占位，前端需替换为品牌 Logo 图片资源 -->
+      <!-- data-resource: logo.png / logo.svg (待人工提供) -->
+      <div class="flex items-center gap-1">
+        <span style="color: #24EE89; font-weight: 800; font-size: 18px; letter-spacing: -0.5px;">1GO</span>
+        <span style="color: #fff; font-weight: 800; font-size: 18px;">.</span>
+        <span style="color: #fff; font-weight: 800; font-size: 18px;">PLUS</span>
+      </div>
+      <div class="flex-1"></div>
+      <button style="color: #fff; font-weight: 800; font-size: 15px; background: transparent; border: none; padding: 0 12px; height: 40px; cursor: pointer;">Sign In</button>
+      <button style="height: 40px; padding: 0 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 800; font-size: 15px; background: linear-gradient(90deg, #24EE89, #9FE871); color: #000;">Sign Up</button>
+    </header>
+
+    <!-- Banner: height ~160px, gradient background -->
+    <div class="auth-banner">
+      <div class="flex items-start justify-between">
+        <div class="flex-1 min-w-0">
+          <p style="color: #B0B3B3; font-size: 12px; font-weight: 400;">Secure and Fast</p>
+          <h1 style="color: #fff; font-weight: 800; font-size: 22px; line-height: 1.2; margin-top: 4px;">
+            Sign Up &amp; Get
+          </h1>
+          <p style="color: #fff; font-weight: 800; font-size: 32px; line-height: 1.1; margin-top: 2px;">
+            100 Bonuses
+          </p>
+        </div>
+        <!-- 装饰图占位: 奖轮/金币/飞机图形 -->
+        <!-- data-resource: banner-decoration.png (待人工提供) -->
+        <!-- 前端实现: 使用 <img src="assets/banner-decoration.png"> 替换此 SVG -->
+        <div class="flex-shrink-0" style="width: 140px; height: 110px; position: relative;">
+          <svg viewBox="0 0 140 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; opacity: 0.5;">
+            <!-- Wheel outer ring -->
+            <circle cx="80" cy="50" r="44" stroke="#24EE89" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.5"/>
+            <!-- Wheel inner ring -->
+            <circle cx="80" cy="50" r="30" stroke="#9FE871" stroke-width="1" opacity="0.4"/>
+            <!-- Center glow -->
+            <circle cx="80" cy="50" r="16" fill="url(#glow1)" opacity="0.3"/>
+            <!-- Spokes -->
+            <line x1="80" y1="6" x2="80" y2="20" stroke="#24EE89" stroke-width="1" opacity="0.3"/>
+            <line x1="80" y1="80" x2="80" y2="94" stroke="#24EE89" stroke-width="1" opacity="0.3"/>
+            <line x1="36" y1="50" x2="50" y2="50" stroke="#24EE89" stroke-width="1" opacity="0.3"/>
+            <line x1="110" y1="50" x2="124" y2="50" stroke="#24EE89" stroke-width="1" opacity="0.3"/>
+            <!-- Coins -->
+            <circle cx="30" cy="25" r="8" fill="#B8860B" opacity="0.4"/>
+            <circle cx="26" cy="85" r="6" fill="#DAA520" opacity="0.3"/>
+            <circle cx="125" cy="80" r="7" fill="#B8860B" opacity="0.35"/>
+            <text x="30" y="28" text-anchor="middle" fill="#FFD700" font-size="8" font-weight="bold" opacity="0.6">$</text>
+            <text x="26" y="88" text-anchor="middle" fill="#FFD700" font-size="6" font-weight="bold" opacity="0.5">$</text>
+            <defs>
+              <radialGradient id="glow1" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0%" stop-color="#24EE89" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#24EE89" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Section: padding 0 16px -->
+    <div style="padding: 0 16px;">
+
+      <!-- Section title -->
+      <h2 style="color: #fff; font-weight: 800; font-size: 18px; margin: 16px 0 12px;">Sign Up</h2>
+
+      <!-- Phone Number Input -->
+      <!-- height: 48px, bg: #1E2121, border: 1px #3A4142, radius: 8px -->
+      <div class="form-input">
+        <span class="prefix">+91</span>
+        <input type="tel" placeholder="Phone Number" maxlength="10">
+      </div>
+
+      <!-- Password Input -->
+      <!-- margin-top: 12px -->
+      <div class="form-input" style="margin-top: 12px;">
+        <input type="password" placeholder="Password ( 6-16 digits )">
+        <div class="icon-btn">
+          <!-- eye-off icon: Resources/icons/eye-off.svg -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+            <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- OTP Input Row -->
+      <div class="form-input" style="margin-top: 12px;">
+        <input type="tel" placeholder="OTP" maxlength="6">
+        <button class="btn-otp">Send OTP</button>
+      </div>
+
+      <!-- Gift Selection: margin-top 16px -->
+      <div style="margin-top: 16px;">
+        <p style="color: #B0B3B3; font-size: 14px; margin-bottom: 8px;">Select your sign up gift</p>
+        <div style="display: flex; gap: 8px;">
+
+          <!-- Aviator Card (selected) -->
+          <div class="gift-card selected">
+            <div class="thumb">
+              <!-- data-resource: aviator-thumb.png (待人工提供) -->
+              <!-- 前端实现: 使用 <img src="assets/games/aviator.png"> 替换 -->
+              <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                <rect width="60" height="60" fill="#1A1D1D"/>
+                <path d="M18 40L30 20L42 40" stroke="#24EE89" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                <circle cx="30" cy="28" r="4" fill="#24EE89" opacity="0.35"/>
+                <path d="M22 35h16" stroke="#24EE89" stroke-width="1" opacity="0.3"/>
+              </svg>
+            </div>
+            <div class="amount">x100</div>
+            <div class="label">Aviator FS</div>
+            <div class="badge badge-active">Active</div>
+          </div>
+
+          <!-- MoneyComing Card (unselected) -->
+          <div class="gift-card">
+            <div class="thumb">
+              <!-- data-resource: moneycoming-thumb.png (待人工提供) -->
+              <!-- 前端实现: 使用 <img src="assets/games/moneycoming.png"> 替换 -->
+              <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                <rect width="60" height="60" fill="#1A1D1D"/>
+                <circle cx="30" cy="30" r="12" stroke="#9FE871" stroke-width="2" opacity="0.5"/>
+                <text x="30" y="35" text-anchor="middle" fill="#9FE871" font-size="16" font-weight="bold" opacity="0.4">$</text>
+              </svg>
+            </div>
+            <div class="amount">x100</div>
+            <div class="label">MoneyComing FS</div>
+            <div class="badge badge-inactive">Apply</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Invite Code (optional, collapsed by default) -->
+      <div class="form-input" style="margin-top: 12px;">
+        <input type="text" placeholder="Enter Invite Code (Optional)">
+        <!-- chevron-down icon: Resources/icons/chevron-down.svg -->
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Agreements: margin-top 16px -->
+      <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+        <!-- Agreement 1 (checked) -->
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <div class="custom-check checked" style="margin-top: 1px;">
+            <!-- check icon: Resources/icons/check.svg -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <p style="color: #B0B3B3; font-size: 12px; line-height: 1.5;">
+            I agree to the <span style="color: #24EE89; cursor: pointer; text-decoration: underline;">User Agreement</span> &amp; confirm I am at least 18 years old
+          </p>
+        </div>
+        <!-- Agreement 2 (checked) -->
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <div class="custom-check checked" style="margin-top: 1px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <p style="color: #B0B3B3; font-size: 12px; line-height: 1.5;">
+            I agree to receive marketing promotions from 1GO.PLUS.
+          </p>
+        </div>
+      </div>
+
+      <!-- Sign Up Button: margin-top 20px -->
+      <div style="margin-top: 20px;">
+        <button class="btn-primary">Sign Up</button>
+      </div>
+
+      <!-- Google Sign Up: margin-top 12px -->
+      <div style="margin-top: 12px;">
+        <button class="btn-google">
+          <!-- google icon: Resources/icons/google.svg -->
+          <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 001 12c0 1.61.39 3.14 1.07 4.5l3.77-2.41z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        </button>
+      </div>
+
+      <!-- Bottom link: margin-top 16px, padding-bottom 32px -->
+      <div style="margin-top: 16px; padding-bottom: 32px; text-align: center;">
+        <span style="color: #B0B3B3; font-size: 14px;">Already have an account?</span>
+        <span style="color: #24EE89; font-size: 14px; font-weight: 600; cursor: pointer; margin-left: 4px;">Sign In</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================================================================
+     PAGE 2: SIGN IN (Password Mode) -- Normal State
+     ================================================================== -->
+<div id="page-signin-password" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="flex items-center gap-1">
+        <span style="color: #24EE89; font-weight: 800; font-size: 18px; letter-spacing: -0.5px;">1GO</span>
+        <span style="color: #fff; font-weight: 800; font-size: 18px;">.</span>
+        <span style="color: #fff; font-weight: 800; font-size: 18px;">PLUS</span>
+      </div>
+      <div class="flex-1"></div>
+      <button style="color: #fff; font-weight: 800; font-size: 15px; background: transparent; border: none; padding: 0 12px; height: 40px; cursor: pointer;">Sign In</button>
+      <button style="height: 40px; padding: 0 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 800; font-size: 15px; background: linear-gradient(90deg, #24EE89, #9FE871); color: #000;">Sign Up</button>
+    </header>
+
+    <!-- Banner (smaller for login) -->
+    <div class="auth-banner auth-banner-signin">
+      <div class="flex items-start justify-between">
+        <div class="flex-1 min-w-0">
+          <p style="color: #B0B3B3; font-size: 12px;">Secure and Fast</p>
+          <h1 style="color: #fff; font-weight: 800; font-size: 22px; line-height: 1.2; margin-top: 4px;">
+            Welcome Back
+          </h1>
+        </div>
+        <!-- 装饰图占位 -->
+        <div class="flex-shrink-0" style="width: 110px; height: 80px;">
+          <svg viewBox="0 0 110 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; opacity: 0.5;">
+            <circle cx="60" cy="40" r="32" stroke="#24EE89" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.5"/>
+            <circle cx="60" cy="40" r="20" stroke="#9FE871" stroke-width="1" opacity="0.4"/>
+            <circle cx="60" cy="40" r="10" fill="#24EE89" opacity="0.15"/>
+            <circle cx="18" cy="20" r="6" fill="#B8860B" opacity="0.4"/>
+            <circle cx="95" cy="60" r="5" fill="#DAA520" opacity="0.35"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <div style="padding: 0 16px;">
+
+      <h2 style="color: #fff; font-weight: 800; font-size: 18px; margin: 16px 0 12px;">Sign In</h2>
+
+      <!-- Login Method Tabs -->
+      <div class="auth-tabs" style="margin-bottom: 16px;">
+        <button class="auth-tab active">Password</button>
+        <button class="auth-tab">OTP Login</button>
+      </div>
+
+      <!-- Phone Number -->
+      <div class="form-input">
+        <span class="prefix">+91</span>
+        <input type="tel" placeholder="Phone Number" maxlength="10">
+      </div>
+
+      <!-- Password -->
+      <div class="form-input" style="margin-top: 12px;">
+        <input type="password" placeholder="Password">
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+            <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Forgot Password -->
+      <div style="margin-top: 8px; text-align: right;">
+        <span style="color: #24EE89; font-size: 12px; cursor: pointer;">Forgot Password?</span>
+      </div>
+
+      <!-- Sign In Button -->
+      <div style="margin-top: 20px;">
+        <button class="btn-primary">Sign In</button>
+      </div>
+
+      <!-- Google Sign In -->
+      <div style="margin-top: 12px;">
+        <button class="btn-google">
+          <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 001 12c0 1.61.39 3.14 1.07 4.5l3.77-2.41z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        </button>
+      </div>
+
+      <!-- Bottom link -->
+      <div style="margin-top: 16px; padding-bottom: 32px; text-align: center;">
+        <span style="color: #B0B3B3; font-size: 14px;">Don't have an account?</span>
+        <span style="color: #24EE89; font-size: 14px; font-weight: 600; cursor: pointer; margin-left: 4px;">Sign Up</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================================================================
+     PAGE 3: SIGN IN (OTP Mode)
+     ================================================================== -->
+<div id="page-signin-otp" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="flex items-center gap-1">
+        <span style="color: #24EE89; font-weight: 800; font-size: 18px; letter-spacing: -0.5px;">1GO</span>
+        <span style="color: #fff; font-weight: 800; font-size: 18px;">.</span>
+        <span style="color: #fff; font-weight: 800; font-size: 18px;">PLUS</span>
+      </div>
+      <div class="flex-1"></div>
+      <button style="color: #fff; font-weight: 800; font-size: 15px; background: transparent; border: none; padding: 0 12px; height: 40px; cursor: pointer;">Sign In</button>
+      <button style="height: 40px; padding: 0 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 800; font-size: 15px; background: linear-gradient(90deg, #24EE89, #9FE871); color: #000;">Sign Up</button>
+    </header>
+
+    <!-- Banner -->
+    <div class="auth-banner auth-banner-signin">
+      <div class="flex items-start justify-between">
+        <div class="flex-1 min-w-0">
+          <p style="color: #B0B3B3; font-size: 12px;">Secure and Fast</p>
+          <h1 style="color: #fff; font-weight: 800; font-size: 22px; line-height: 1.2; margin-top: 4px;">
+            Welcome Back
+          </h1>
+        </div>
+        <div class="flex-shrink-0" style="width: 110px; height: 80px;">
+          <svg viewBox="0 0 110 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; opacity: 0.5;">
+            <circle cx="60" cy="40" r="32" stroke="#24EE89" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.5"/>
+            <circle cx="60" cy="40" r="20" stroke="#9FE871" stroke-width="1" opacity="0.4"/>
+            <circle cx="60" cy="40" r="10" fill="#24EE89" opacity="0.15"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <div style="padding: 0 16px;">
+
+      <h2 style="color: #fff; font-weight: 800; font-size: 18px; margin: 16px 0 12px;">Sign In</h2>
+
+      <!-- Login Method Tabs (OTP active) -->
+      <div class="auth-tabs" style="margin-bottom: 16px;">
+        <button class="auth-tab">Password</button>
+        <button class="auth-tab active">OTP Login</button>
+      </div>
+
+      <!-- Phone Number -->
+      <div class="form-input">
+        <span class="prefix">+91</span>
+        <input type="tel" placeholder="Phone Number" maxlength="10">
+      </div>
+
+      <!-- OTP Input Row -->
+      <div class="form-input" style="margin-top: 12px;">
+        <input type="tel" placeholder="OTP" maxlength="6">
+        <button class="btn-otp">Send OTP</button>
+      </div>
+
+      <!-- Sign In Button -->
+      <div style="margin-top: 20px;">
+        <button class="btn-primary">Sign In</button>
+      </div>
+
+      <!-- Google Sign In -->
+      <div style="margin-top: 12px;">
+        <button class="btn-google">
+          <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 001 12c0 1.61.39 3.14 1.07 4.5l3.77-2.41z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        </button>
+      </div>
+
+      <!-- Bottom link -->
+      <div style="margin-top: 16px; padding-bottom: 32px; text-align: center;">
+        <span style="color: #B0B3B3; font-size: 14px;">Don't have an account?</span>
+        <span style="color: #24EE89; font-size: 14px; font-weight: 600; cursor: pointer; margin-left: 4px;">Sign Up</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================================================================
+     PAGE 4: SIGN UP -- Error State (Form Validation)
+     Shows inline error messages below invalid fields.
+     ================================================================== -->
+<div id="page-signup-error" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <header class="app-header">
+      <div class="flex items-center gap-1">
+        <span style="color: #24EE89; font-weight: 800; font-size: 18px; letter-spacing: -0.5px;">1GO</span>
+        <span style="color: #fff; font-weight: 800; font-size: 18px;">.</span>
+        <span style="color: #fff; font-weight: 800; font-size: 18px;">PLUS</span>
+      </div>
+      <div class="flex-1"></div>
+      <button style="color: #fff; font-weight: 800; font-size: 15px; background: transparent; border: none; padding: 0 12px; height: 40px; cursor: pointer;">Sign In</button>
+      <button style="height: 40px; padding: 0 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 800; font-size: 15px; background: linear-gradient(90deg, #24EE89, #9FE871); color: #000;">Sign Up</button>
+    </header>
+
+    <div class="auth-banner">
+      <div class="flex items-start justify-between">
+        <div class="flex-1 min-w-0">
+          <p style="color: #B0B3B3; font-size: 12px;">Secure and Fast</p>
+          <h1 style="color: #fff; font-weight: 800; font-size: 22px; line-height: 1.2; margin-top: 4px;">Sign Up &amp; Get</h1>
+          <p style="color: #fff; font-weight: 800; font-size: 32px; line-height: 1.1; margin-top: 2px;">100 Bonuses</p>
+        </div>
+        <div class="flex-shrink-0" style="width: 140px; height: 110px;">
+          <svg viewBox="0 0 140 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; opacity: 0.5;">
+            <circle cx="80" cy="50" r="44" stroke="#24EE89" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.5"/>
+            <circle cx="80" cy="50" r="30" stroke="#9FE871" stroke-width="1" opacity="0.4"/>
+            <circle cx="80" cy="50" r="16" fill="#24EE89" opacity="0.1"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 0 16px;">
+      <h2 style="color: #fff; font-weight: 800; font-size: 18px; margin: 16px 0 12px;">Sign Up</h2>
+
+      <!-- Phone Number (ERROR: empty) -->
+      <div class="form-input error">
+        <span class="prefix">+91</span>
+        <input type="tel" placeholder="Phone Number">
+      </div>
+      <p class="error-text">Please enter your phone number</p>
+
+      <!-- Password (ERROR: too short) -->
+      <div class="form-input error" style="margin-top: 12px;">
+        <input type="password" placeholder="Password ( 6-16 digits )" value="123">
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+      </div>
+      <p class="error-text">Password must be 6-16 characters</p>
+
+      <!-- OTP (ERROR: empty) -->
+      <div class="form-input error" style="margin-top: 12px;">
+        <input type="tel" placeholder="OTP">
+        <button class="btn-otp">Send OTP</button>
+      </div>
+      <p class="error-text">Please enter OTP verification code</p>
+
+      <!-- Gift Selection -->
+      <div style="margin-top: 16px;">
+        <p style="color: #B0B3B3; font-size: 14px; margin-bottom: 8px;">Select your sign up gift</p>
+        <div style="display: flex; gap: 8px;">
+          <div class="gift-card selected">
+            <div class="thumb">
+              <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                <rect width="60" height="60" fill="#1A1D1D"/>
+                <path d="M18 40L30 20L42 40" stroke="#24EE89" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                <circle cx="30" cy="28" r="4" fill="#24EE89" opacity="0.35"/>
+              </svg>
+            </div>
+            <div class="amount">x100</div>
+            <div class="label">Aviator FS</div>
+            <div class="badge badge-active">Active</div>
+          </div>
+          <div class="gift-card">
+            <div class="thumb">
+              <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                <rect width="60" height="60" fill="#1A1D1D"/>
+                <circle cx="30" cy="30" r="12" stroke="#9FE871" stroke-width="2" opacity="0.5"/>
+                <text x="30" y="35" text-anchor="middle" fill="#9FE871" font-size="16" font-weight="bold" opacity="0.4">$</text>
+              </svg>
+            </div>
+            <div class="amount">x100</div>
+            <div class="label">MoneyComing FS</div>
+            <div class="badge badge-inactive">Apply</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invite Code -->
+      <div class="form-input" style="margin-top: 12px;">
+        <input type="text" placeholder="Enter Invite Code (Optional)">
+      </div>
+
+      <!-- Agreements (unchecked state) -->
+      <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <div class="custom-check unchecked" style="margin-top: 1px;"></div>
+          <p style="color: #FF4757; font-size: 12px; line-height: 1.5;">
+            Please agree to the <span style="color: #24EE89; cursor: pointer; text-decoration: underline;">User Agreement</span> &amp; confirm you are at least 18 years old
+          </p>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <div class="custom-check unchecked" style="margin-top: 1px;"></div>
+          <p style="color: #B0B3B3; font-size: 12px; line-height: 1.5;">
+            I agree to receive marketing promotions from 1GO.PLUS.
+          </p>
+        </div>
+      </div>
+
+      <!-- Sign Up Button -->
+      <div style="margin-top: 20px;">
+        <button class="btn-primary">Sign Up</button>
+      </div>
+
+      <!-- Google + Bottom link -->
+      <div style="margin-top: 12px;">
+        <button class="btn-google">
+          <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 001 12c0 1.61.39 3.14 1.07 4.5l3.77-2.41z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        </button>
+      </div>
+      <div style="margin-top: 16px; padding-bottom: 32px; text-align: center;">
+        <span style="color: #B0B3B3; font-size: 14px;">Already have an account?</span>
+        <span style="color: #24EE89; font-size: 14px; font-weight: 600; cursor: pointer; margin-left: 4px;">Sign In</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================================================================
+     PAGE 5: SIGN UP -- Loading State
+     Shows button loading spinner, all inputs disabled.
+     ================================================================== -->
+<div id="page-signup-loading" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <header class="app-header">
+      <div class="flex items-center gap-1">
+        <span style="color: #24EE89; font-weight: 800; font-size: 18px; letter-spacing: -0.5px;">1GO</span>
+        <span style="color: #fff; font-weight: 800; font-size: 18px;">.</span>
+        <span style="color: #fff; font-weight: 800; font-size: 18px;">PLUS</span>
+      </div>
+      <div class="flex-1"></div>
+      <button style="color: #fff; font-weight: 800; font-size: 15px; background: transparent; border: none; padding: 0 12px; height: 40px; cursor: pointer;">Sign In</button>
+      <button style="height: 40px; padding: 0 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 800; font-size: 15px; background: linear-gradient(90deg, #24EE89, #9FE871); color: #000;">Sign Up</button>
+    </header>
+
+    <div class="auth-banner">
+      <div class="flex items-start justify-between">
+        <div class="flex-1 min-w-0">
+          <p style="color: #B0B3B3; font-size: 12px;">Secure and Fast</p>
+          <h1 style="color: #fff; font-weight: 800; font-size: 22px; line-height: 1.2; margin-top: 4px;">Sign Up &amp; Get</h1>
+          <p style="color: #fff; font-weight: 800; font-size: 32px; line-height: 1.1; margin-top: 2px;">100 Bonuses</p>
+        </div>
+        <div class="flex-shrink-0" style="width: 140px; height: 110px;">
+          <svg viewBox="0 0 140 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; opacity: 0.5;">
+            <circle cx="80" cy="50" r="44" stroke="#24EE89" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.5"/>
+            <circle cx="80" cy="50" r="30" stroke="#9FE871" stroke-width="1" opacity="0.4"/>
+            <circle cx="80" cy="50" r="16" fill="#24EE89" opacity="0.1"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 0 16px;">
+      <h2 style="color: #fff; font-weight: 800; font-size: 18px; margin: 16px 0 12px;">Sign Up</h2>
+
+      <!-- Filled form (disabled during loading) -->
+      <div class="form-input" style="opacity: 0.6;">
+        <span class="prefix">+91</span>
+        <input type="tel" value="9876543210" disabled style="color: #fff;">
+      </div>
+      <div class="form-input" style="margin-top: 12px; opacity: 0.6;">
+        <input type="password" value="password123" disabled>
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
+            <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </div>
+      </div>
+      <div class="form-input" style="margin-top: 12px; opacity: 0.6;">
+        <input type="tel" value="123456" disabled style="color: #fff;">
+        <span style="color: #6B7070; font-size: 14px; font-weight: 600; white-space: nowrap;">45s</span>
+      </div>
+
+      <!-- Gift Selection (disabled) -->
+      <div style="margin-top: 16px; opacity: 0.6;">
+        <p style="color: #B0B3B3; font-size: 14px; margin-bottom: 8px;">Select your sign up gift</p>
+        <div style="display: flex; gap: 8px;">
+          <div class="gift-card selected">
+            <div class="thumb">
+              <svg viewBox="0 0 60 60" fill="none" style="width: 100%; height: 100%;"><rect width="60" height="60" fill="#1A1D1D"/><path d="M18 40L30 20L42 40" stroke="#24EE89" stroke-width="2" opacity="0.5"/></svg>
+            </div>
+            <div class="amount">x100</div>
+            <div class="label">Aviator FS</div>
+            <div class="badge badge-active">Active</div>
+          </div>
+          <div class="gift-card">
+            <div class="thumb">
+              <svg viewBox="0 0 60 60" fill="none" style="width: 100%; height: 100%;"><rect width="60" height="60" fill="#1A1D1D"/><circle cx="30" cy="30" r="12" stroke="#9FE871" stroke-width="2" opacity="0.5"/></svg>
+            </div>
+            <div class="amount">x100</div>
+            <div class="label">MoneyComing FS</div>
+            <div class="badge badge-inactive">Apply</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-input" style="margin-top: 12px; opacity: 0.6;">
+        <input type="text" placeholder="Enter Invite Code (Optional)" disabled>
+      </div>
+
+      <!-- Agreements -->
+      <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px; opacity: 0.6;">
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <div class="custom-check checked" style="margin-top: 1px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <p style="color: #B0B3B3; font-size: 12px; line-height: 1.5;">I agree to the User Agreement &amp; confirm I am at least 18 years old</p>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <div class="custom-check checked" style="margin-top: 1px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <p style="color: #B0B3B3; font-size: 12px; line-height: 1.5;">I agree to receive marketing promotions from 1GO.PLUS.</p>
+        </div>
+      </div>
+
+      <!-- Loading Button -->
+      <div style="margin-top: 20px;">
+        <button class="btn-primary loading" disabled>
+          <div class="spinner"></div>
+        </button>
+      </div>
+
+      <div style="margin-top: 12px;">
+        <button class="btn-google" disabled style="opacity: 0.5;">
+          <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 001 12c0 1.61.39 3.14 1.07 4.5l3.77-2.41z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        </button>
+      </div>
+      <div style="margin-top: 16px; padding-bottom: 32px; text-align: center;">
+        <span style="color: #B0B3B3; font-size: 14px;">Already have an account?</span>
+        <span style="color: #24EE89; font-size: 14px; font-weight: 600; cursor: pointer; margin-left: 4px;">Sign In</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================================================================
+     JavaScript: Tab switcher for design preview
+     ================================================================== -->
+<script>
+  function showPage(page) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

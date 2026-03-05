@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GO PLUS - Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: { DEFAULT: '#1a1a2e', card: '#16213e', hover: '#1f2b47' },
+            accent: { DEFAULT: '#24EE89', dark: '#1DBF6E', light: 'rgba(36,238,137,0.12)' },
+            txt: { DEFAULT: '#e2e8f0', secondary: '#94a3b8', muted: '#64748b' },
+            border: '#334155',
+            danger: '#ef4444',
+            warn: '#f59e0b',
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0f0f1a; font-family: 'Inter', system-ui, sans-serif; color: #e2e8f0; }
+    .preview-tabs { position: sticky; top: 0; z-index: 100; background: #111; padding: 8px 16px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .preview-tab { padding: 6px 14px; border-radius: 6px; background: #333; color: #94a3b8; cursor: pointer; font-size: 12px; font-weight: 600; border: none; }
+    .preview-tab.active { background: #24EE89; color: #0f0f1a; }
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+    table { border-collapse: collapse; }
+    th, td { text-align: left; }
+  </style>
+</head>
+<body>
+
+<!-- PREVIEW TABS -->
+<div class="preview-tabs">
+  <button class="preview-tab active" onclick="showPage('dashboard')">Dashboard</button>
+  <button class="preview-tab" onclick="showPage('users')">Users</button>
+  <button class="preview-tab" onclick="showPage('games')">Games</button>
+  <button class="preview-tab" onclick="showPage('withdrawals')">Withdrawals</button>
+  <button class="preview-tab" onclick="showPage('banners')">Banners</button>
+</div>
+
+<!-- ========================================
+     ADMIN LAYOUT SHELL
+     ======================================== -->
+
+<!-- PAGE: DASHBOARD -->
+<div id="page-dashboard" class="page-section active">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-60 bg-surface flex-shrink-0 border-r border-border hidden lg:block">
+      <div class="p-4 border-b border-border">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
+            <span class="text-surface font-extrabold text-sm">G</span>
+          </div>
+          <span class="text-accent font-extrabold text-base">GO PLUS</span>
+          <span class="text-txt-muted text-xs ml-1">Admin</span>
+        </div>
+      </div>
+      <nav class="p-3 space-y-1">
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-accent/10 text-accent text-sm font-semibold cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-txt-secondary text-sm hover:bg-surface-hover cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          Users
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-txt-secondary text-sm hover:bg-surface-hover cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+          Games
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-txt-secondary text-sm hover:bg-surface-hover cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1"/><circle cx="12" cy="12" r="10"/></svg>
+          Transactions
+          <span class="ml-auto bg-danger text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-txt-secondary text-sm hover:bg-surface-hover cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Banners
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-txt-secondary text-sm hover:bg-surface-hover cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+          Settings
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 min-w-0">
+      <!-- Top Bar -->
+      <header class="h-14 bg-surface border-b border-border flex items-center px-6 justify-between">
+        <h1 class="text-txt font-semibold text-base">Dashboard</h1>
+        <div class="flex items-center gap-3">
+          <span class="text-txt-secondary text-sm">admin@goplus.com</span>
+          <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
+            <span class="text-accent font-bold text-sm">A</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="p-6">
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="bg-surface rounded-xl p-4 border border-border">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-txt-muted text-xs">New Users Today</span>
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6m3-3h-6"/></svg>
+            </div>
+            <p class="text-txt text-2xl font-bold">142</p>
+            <p class="text-accent text-xs mt-1">+12.5% from yesterday</p>
+          </div>
+          <div class="bg-surface rounded-xl p-4 border border-border">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-txt-muted text-xs">Active Users</span>
+              <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>
+            </div>
+            <p class="text-txt text-2xl font-bold">1,847</p>
+            <p class="text-accent text-xs mt-1">+5.2% from yesterday</p>
+          </div>
+          <div class="bg-surface rounded-xl p-4 border border-border">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-txt-muted text-xs">Deposits Today</span>
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+            </div>
+            <p class="text-txt text-2xl font-bold">₹4,52,300</p>
+            <p class="text-accent text-xs mt-1">+18.3% from yesterday</p>
+          </div>
+          <div class="bg-surface rounded-xl p-4 border border-border">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-txt-muted text-xs">Withdrawals Today</span>
+              <svg class="w-5 h-5 text-danger" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+            </div>
+            <p class="text-txt text-2xl font-bold">₹1,23,400</p>
+            <div class="flex items-center gap-2 mt-1">
+              <p class="text-danger text-xs">-3.1% from yesterday</p>
+              <span class="bg-danger text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3 pending</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart Placeholder -->
+        <div class="bg-surface rounded-xl border border-border p-4 mb-6">
+          <h3 class="text-txt font-semibold text-sm mb-4">7-Day Deposits vs Withdrawals</h3>
+          <div class="flex items-end gap-3 h-48">
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full flex gap-1 items-end justify-center" style="height: 160px;">
+                <div class="w-5 bg-accent/60 rounded-t" style="height: 60%"></div>
+                <div class="w-5 bg-danger/60 rounded-t" style="height: 30%"></div>
+              </div>
+              <span class="text-txt-muted text-[10px]">Feb 26</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full flex gap-1 items-end justify-center" style="height: 160px;">
+                <div class="w-5 bg-accent/60 rounded-t" style="height: 75%"></div>
+                <div class="w-5 bg-danger/60 rounded-t" style="height: 25%"></div>
+              </div>
+              <span class="text-txt-muted text-[10px]">Feb 27</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full flex gap-1 items-end justify-center" style="height: 160px;">
+                <div class="w-5 bg-accent/60 rounded-t" style="height: 50%"></div>
+                <div class="w-5 bg-danger/60 rounded-t" style="height: 35%"></div>
+              </div>
+              <span class="text-txt-muted text-[10px]">Feb 28</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full flex gap-1 items-end justify-center" style="height: 160px;">
+                <div class="w-5 bg-accent/60 rounded-t" style="height: 80%"></div>
+                <div class="w-5 bg-danger/60 rounded-t" style="height: 20%"></div>
+              </div>
+              <span class="text-txt-muted text-[10px]">Mar 1</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full flex gap-1 items-end justify-center" style="height: 160px;">
+                <div class="w-5 bg-accent/60 rounded-t" style="height: 65%"></div>
+                <div class="w-5 bg-danger/60 rounded-t" style="height: 40%"></div>
+              </div>
+              <span class="text-txt-muted text-[10px]">Mar 2</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full flex gap-1 items-end justify-center" style="height: 160px;">
+                <div class="w-5 bg-accent/60 rounded-t" style="height: 70%"></div>
+                <div class="w-5 bg-danger/60 rounded-t" style="height: 28%"></div>
+              </div>
+              <span class="text-txt-muted text-[10px]">Mar 3</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full flex gap-1 items-end justify-center" style="height: 160px;">
+                <div class="w-5 bg-accent rounded-t" style="height: 90%"></div>
+                <div class="w-5 bg-danger rounded-t" style="height: 22%"></div>
+              </div>
+              <span class="text-txt text-[10px] font-semibold">Today</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 mt-3">
+            <div class="flex items-center gap-1.5"><div class="w-3 h-3 bg-accent rounded"></div><span class="text-txt-muted text-xs">Deposits</span></div>
+            <div class="flex items-center gap-1.5"><div class="w-3 h-3 bg-danger rounded"></div><span class="text-txt-muted text-xs">Withdrawals</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: USERS -->
+<div id="page-users" class="page-section">
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-txt font-semibold text-lg">User Management</h1>
+      <div class="flex items-center bg-surface border border-border rounded-lg h-9 px-3 w-64">
+        <svg class="w-4 h-4 text-txt-muted mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search by phone number..." class="bg-transparent text-txt text-sm border-none outline-none flex-1">
+      </div>
+    </div>
+    <div class="bg-surface rounded-xl border border-border overflow-hidden">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-border">
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">ID</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Phone</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Registered</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Balance</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Status</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-border/50 hover:bg-surface-hover">
+            <td class="px-4 py-3 text-txt text-sm">#1001</td>
+            <td class="px-4 py-3 text-txt text-sm">+91 98765 43210</td>
+            <td class="px-4 py-3 text-txt-secondary text-sm">2026-03-04</td>
+            <td class="px-4 py-3 text-txt text-sm font-semibold">₹1,250.00</td>
+            <td class="px-4 py-3"><span class="bg-accent/15 text-accent text-xs font-bold px-2 py-0.5 rounded">Active</span></td>
+            <td class="px-4 py-3">
+              <button class="text-accent text-xs font-semibold cursor-pointer hover:underline mr-2">View</button>
+              <button class="text-danger text-xs font-semibold cursor-pointer hover:underline">Disable</button>
+            </td>
+          </tr>
+          <tr class="border-b border-border/50 hover:bg-surface-hover">
+            <td class="px-4 py-3 text-txt text-sm">#1002</td>
+            <td class="px-4 py-3 text-txt text-sm">+91 87654 32109</td>
+            <td class="px-4 py-3 text-txt-secondary text-sm">2026-03-03</td>
+            <td class="px-4 py-3 text-txt text-sm font-semibold">₹500.00</td>
+            <td class="px-4 py-3"><span class="bg-accent/15 text-accent text-xs font-bold px-2 py-0.5 rounded">Active</span></td>
+            <td class="px-4 py-3">
+              <button class="text-accent text-xs font-semibold cursor-pointer hover:underline mr-2">View</button>
+              <button class="text-danger text-xs font-semibold cursor-pointer hover:underline">Disable</button>
+            </td>
+          </tr>
+          <tr class="border-b border-border/50 hover:bg-surface-hover">
+            <td class="px-4 py-3 text-txt text-sm">#1003</td>
+            <td class="px-4 py-3 text-txt text-sm">+91 76543 21098</td>
+            <td class="px-4 py-3 text-txt-secondary text-sm">2026-03-02</td>
+            <td class="px-4 py-3 text-txt text-sm font-semibold">₹0.00</td>
+            <td class="px-4 py-3"><span class="bg-danger/15 text-danger text-xs font-bold px-2 py-0.5 rounded">Disabled</span></td>
+            <td class="px-4 py-3">
+              <button class="text-accent text-xs font-semibold cursor-pointer hover:underline mr-2">View</button>
+              <button class="text-accent text-xs font-semibold cursor-pointer hover:underline">Enable</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Pagination -->
+      <div class="flex items-center justify-between px-4 py-3 border-t border-border">
+        <span class="text-txt-muted text-xs">Showing 1-3 of 142 users</span>
+        <div class="flex gap-1">
+          <button class="w-8 h-8 rounded bg-surface-hover text-txt-muted text-xs cursor-pointer">1</button>
+          <button class="w-8 h-8 rounded bg-accent text-surface text-xs font-bold cursor-pointer">2</button>
+          <button class="w-8 h-8 rounded bg-surface-hover text-txt-muted text-xs cursor-pointer">3</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: GAMES -->
+<div id="page-games" class="page-section">
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-txt font-semibold text-lg">Game Management</h1>
+      <div class="flex items-center gap-3">
+        <select class="bg-surface border border-border rounded-lg text-txt-secondary text-sm h-9 px-3 cursor-pointer">
+          <option>All Categories</option>
+          <option>Slots</option>
+          <option>Live</option>
+          <option>Crash</option>
+        </select>
+        <select class="bg-surface border border-border rounded-lg text-txt-secondary text-sm h-9 px-3 cursor-pointer">
+          <option>All Providers</option>
+          <option>JILI</option>
+          <option>Spribe</option>
+        </select>
+      </div>
+    </div>
+    <div class="bg-surface rounded-xl border border-border overflow-hidden">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-border">
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Thumb</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Game Name</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Provider</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Category</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Status</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-border/50 hover:bg-surface-hover">
+            <td class="px-4 py-2"><div class="w-10 h-10 rounded bg-gradient-to-br from-red-700 to-orange-600"></div></td>
+            <td class="px-4 py-3 text-txt text-sm font-semibold">Aviator</td>
+            <td class="px-4 py-3 text-txt-secondary text-sm">Spribe</td>
+            <td class="px-4 py-3 text-txt-secondary text-sm">Crash</td>
+            <td class="px-4 py-3"><span class="bg-accent/15 text-accent text-xs font-bold px-2 py-0.5 rounded">Live</span></td>
+            <td class="px-4 py-3">
+              <button class="text-warn text-xs font-semibold cursor-pointer hover:underline">Take Down</button>
+            </td>
+          </tr>
+          <tr class="border-b border-border/50 hover:bg-surface-hover">
+            <td class="px-4 py-2"><div class="w-10 h-10 rounded bg-gradient-to-br from-pink-700 to-pink-500"></div></td>
+            <td class="px-4 py-3 text-txt text-sm font-semibold">Piggy Bank</td>
+            <td class="px-4 py-3 text-txt-secondary text-sm">JDB</td>
+            <td class="px-4 py-3 text-txt-secondary text-sm">Slots</td>
+            <td class="px-4 py-3"><span class="bg-txt-muted/15 text-txt-muted text-xs font-bold px-2 py-0.5 rounded">Offline</span></td>
+            <td class="px-4 py-3">
+              <button class="text-accent text-xs font-semibold cursor-pointer hover:underline">Go Live</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: WITHDRAWALS -->
+<div id="page-withdrawals" class="page-section">
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-txt font-semibold text-lg">Withdrawal Review</h1>
+      <span class="bg-danger text-white text-xs font-bold px-2 py-1 rounded-full">3 Pending</span>
+    </div>
+    <div class="bg-surface rounded-xl border border-border overflow-hidden">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-border">
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">ID</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">User</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Amount</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Method</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Status</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Time</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-border/50 bg-warn/5">
+            <td class="px-4 py-3 text-txt text-sm">#W-501</td>
+            <td class="px-4 py-3 text-txt text-sm">+91 98765 43210</td>
+            <td class="px-4 py-3 text-txt text-sm font-bold">₹5,000.00</td>
+            <td class="px-4 py-3 text-txt-secondary text-sm">UPI</td>
+            <td class="px-4 py-3"><span class="bg-warn/15 text-warn text-xs font-bold px-2 py-0.5 rounded">Pending</span></td>
+            <td class="px-4 py-3 text-txt-muted text-sm">14:30</td>
+            <td class="px-4 py-3 flex gap-2">
+              <button class="bg-accent text-surface text-xs font-bold px-3 py-1.5 rounded cursor-pointer hover:bg-accent-dark transition-colors">Approve</button>
+              <button class="bg-danger text-white text-xs font-bold px-3 py-1.5 rounded cursor-pointer hover:opacity-80 transition-opacity">Reject</button>
+            </td>
+          </tr>
+          <tr class="border-b border-border/50 bg-warn/5">
+            <td class="px-4 py-3 text-txt text-sm">#W-500</td>
+            <td class="px-4 py-3 text-txt text-sm">+91 87654 32109</td>
+            <td class="px-4 py-3 text-txt text-sm font-bold">₹2,000.00</td>
+            <td class="px-4 py-3 text-txt-secondary text-sm">Bank</td>
+            <td class="px-4 py-3"><span class="bg-warn/15 text-warn text-xs font-bold px-2 py-0.5 rounded">Pending</span></td>
+            <td class="px-4 py-3 text-txt-muted text-sm">13:15</td>
+            <td class="px-4 py-3 flex gap-2">
+              <button class="bg-accent text-surface text-xs font-bold px-3 py-1.5 rounded cursor-pointer">Approve</button>
+              <button class="bg-danger text-white text-xs font-bold px-3 py-1.5 rounded cursor-pointer">Reject</button>
+            </td>
+          </tr>
+          <tr class="border-b border-border/50">
+            <td class="px-4 py-3 text-txt text-sm">#W-499</td>
+            <td class="px-4 py-3 text-txt text-sm">+91 76543 21098</td>
+            <td class="px-4 py-3 text-txt text-sm font-bold">₹1,000.00</td>
+            <td class="px-4 py-3 text-txt-secondary text-sm">UPI</td>
+            <td class="px-4 py-3"><span class="bg-accent/15 text-accent text-xs font-bold px-2 py-0.5 rounded">Approved</span></td>
+            <td class="px-4 py-3 text-txt-muted text-sm">11:30</td>
+            <td class="px-4 py-3 text-txt-muted text-sm">--</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: BANNERS -->
+<div id="page-banners" class="page-section">
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-txt font-semibold text-lg">Banner Management</h1>
+      <button class="bg-accent text-surface text-sm font-bold px-4 py-2 rounded-lg cursor-pointer hover:bg-accent-dark transition-colors">+ Add Banner</button>
+    </div>
+    <div class="bg-surface rounded-xl border border-border overflow-hidden">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-border">
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Preview</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Title</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Link</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Order</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Status</th>
+            <th class="px-4 py-3 text-txt-muted text-xs font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-border/50 hover:bg-surface-hover">
+            <td class="px-4 py-2"><div class="w-24 h-12 rounded bg-gradient-to-r from-red-900 to-red-700"></div></td>
+            <td class="px-4 py-3 text-txt text-sm">Welcome Bonus 100</td>
+            <td class="px-4 py-3 text-txt-muted text-sm truncate max-w-[200px]">/signup</td>
+            <td class="px-4 py-3 text-txt text-sm">1</td>
+            <td class="px-4 py-3"><span class="bg-accent/15 text-accent text-xs font-bold px-2 py-0.5 rounded">Active</span></td>
+            <td class="px-4 py-3">
+              <button class="text-accent text-xs font-semibold cursor-pointer hover:underline mr-2">Edit</button>
+              <button class="text-danger text-xs font-semibold cursor-pointer hover:underline">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showPage(page) {
+    document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.preview-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+</script>
+
+</body>
+</html>

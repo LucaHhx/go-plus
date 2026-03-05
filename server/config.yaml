@@ -1,0 +1,22 @@
+server:
+  port: 8080
+  mode: debug  # debug / release
+
+database:
+  path: ./data/go-plus.db
+
+jwt:
+  secret: go-plus-jwt-secret-key-change-in-production
+  expire_hours: 24
+
+otp:
+  expire_minutes: 5
+  mock: true           # true = 固定验证码 123456
+  fixed_code: "123456"
+
+google:
+  mock: true           # true = 跳过 Google Token 验证
+
+log:
+  level: debug         # debug / info / warn / error
+  file: ./logs/app.log

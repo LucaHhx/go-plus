@@ -1,0 +1,36 @@
+/**
+ * Design Tokens -- GO PLUS 管理后台
+ * 管理后台使用独立深蓝色系深色主题，与客户端配色体系不同
+ * 基于 merge.html tailwind.config 实际值
+ */
+
+:root {
+  /* ===== Colors: Surface / Background ===== */
+  --admin-bg: #0f0f1a;                /* body 背景 */
+  --admin-surface: #1a1a2e;           /* 卡片/侧边栏/表格背景 */
+  --admin-surface-card: #16213e;      /* 深层卡片 */
+  --admin-surface-hover: #1f2b47;     /* 悬浮态 */
+
+  /* ===== Colors: Brand / Accent ===== */
+  --admin-accent: #24EE89;            /* 品牌绿 (与前台一致) */
+  --admin-accent-dark: #1DBF6E;
+  --admin-accent-light: rgba(36, 238, 137, 0.12);
+
+  /* ===== Colors: Text ===== */
+  --admin-txt: #e2e8f0;               /* 主要文字 (浅色) */
+  --admin-txt-secondary: #94a3b8;     /* 次要文字 */
+  --admin-txt-muted: #64748b;         /* 弱文字 */
+
+  /* ===== Colors: Semantic ===== */
+  --admin-danger: #ef4444;
+  --admin-warn: #f59e0b;
+  --admin-border: #334155;
+
+  /* ===== Typography ===== */
+  --admin-font-family: 'Inter', system-ui, sans-serif;
+
+  /* ===== Layout ===== */
+  --admin-sidebar-width: 240px;
+  --admin-header-height: 56px;
+  --admin-content-padding: 24px;
+}

@@ -1,0 +1,251 @@
+@import "tailwindcss";
+
+/* =============================================
+   GO PLUS Design System
+   Background: #232626 | Brand: #24EE89
+   Font: AvertaStd (800/600/400)
+   ============================================= */
+
+@font-face {
+  font-family: "AvertaStd";
+  src: url("/assets/fonts/AvertaStd-ExtraBold.woff2") format("woff2");
+  font-weight: 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: "AvertaStd";
+  src: url("/assets/fonts/AvertaStd-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "AvertaStd";
+  src: url("/assets/fonts/AvertaStd-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@theme {
+  /* Colors */
+  --color-bg: #232626;
+  --color-bg-deep: #1a1d1d;
+  --color-bg-card: #2a2d2d;
+  --color-bg-hover: #323738;
+  --color-bg-input: #1e2020;
+  --color-bg-layer4: #323738;
+
+  --color-brand: #24ee89;
+  --color-brand-dark: #1dbf6e;
+  --color-brand-end: #9fe871;
+  --color-brand-light: rgba(36,238,137,0.15);
+
+  --color-txt: #ffffff;
+  --color-txt-secondary: #b0b3b3;
+  --color-txt-muted: #6b7070;
+
+  --color-divider: #3a4142;
+  --color-error: #ff4757;
+  --color-warning: #ffa502;
+  --color-gold: #ffd700;
+
+  --color-social-telegram: #229ed9;
+  --color-social-facebook: #1877f2;
+  --color-social-whatsapp: #25d366;
+  --color-social-youtube: #ff0000;
+
+  /* Font family */
+  --font-sans: "AvertaStd", "Inter", system-ui, sans-serif;
+
+  /* Font size */
+  --text-2xs: 10px;
+}
+
+/* Global resets - must be in @layer base to not override Tailwind v4 utilities */
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100dvh;
+  background: var(--color-bg-deep);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--color-txt);
+}
+
+#root {
+  width: 100%;
+  min-height: 100dvh;
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-divider);
+  border-radius: 2px;
+}
+
+/* Disable number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Input placeholder color */
+input::placeholder {
+  color: #6B7070;
+}
+
+/* Spinner animation for loading buttons */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Hide scrollbar for horizontal scroll areas */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Tab bar active/inactive states (from design spec) */
+.tab-active { color: #24EE89; }
+.tab-inactive { color: #6B7070; }
+
+/* Smooth scroll for game grids */
+.game-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Game card in horizontal grid */
+.game-icon-card {
+  width: 56px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.game-icon-card:hover {
+  transform: scale(1.1);
+}
+.game-icon-card img {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+.game-icon-card span {
+  font-size: 10px;
+  color: #B0B3B3;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 56px;
+  display: block;
+}
+
+/* GET 1700 tab styles (from design spec) */
+.get1700-wrap {
+  position: relative;
+  width: 80px;
+  height: 70px;
+  margin-top: -30px;
+}
+.get1700-wrap img {
+  width: 100%;
+  transform: scale(1.35);
+  margin-top: -6px;
+  margin-left: 1px;
+  z-index: 9;
+  position: relative;
+  animation: rainbowRotate 3s linear infinite;
+}
+.get1700-bg {
+  position: absolute;
+  background-color: rgb(1, 68, 28);
+  width: 5.5rem;
+  height: 3rem;
+  top: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* GET 1700 tab rainbow rotation */
+@keyframes rainbowRotate {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* Hot Event icon pulse */
+@keyframes hotEventPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+.hot-event-icon {
+  animation: hotEventPulse 1.5s ease-in-out infinite;
+}
+
+/* Jackpot glow */
+@keyframes jackpotPulse {
+  0%, 100% { text-shadow: 0 0 10px rgba(36, 238, 137, 0.5); }
+  50% { text-shadow: 0 0 20px rgba(36, 238, 137, 0.8); }
+}
+
+/* Countdown timer pulse */
+@keyframes countdownPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Big Win marquee scroll */
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Skeleton shimmer animation */
+.skeleton {
+  background: #2A2D2D;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}

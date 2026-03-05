@@ -1,0 +1,139 @@
+/**
+ * Design Tokens -- GO PLUS 游戏大厅
+ * 从 design.md 设计系统提取的 CSS 自定义属性
+ * 前端可直接引用，也可通过 Tailwind 配置使用
+ */
+
+:root {
+  /* ===== Colors: Background ===== */
+  --color-bg: #232626;
+  --color-bg-deep: #1A1D1D;
+  --color-bg-card: #2A2D2D;
+  --color-bg-hover: #323738;
+  --color-bg-input: #1E2020;
+
+  /* ===== Colors: Brand ===== */
+  --color-brand: #24EE89;
+  --color-brand-dark: #1DBF6E;
+  --color-brand-end: #9FE871;
+
+  /* ===== Colors: Text ===== */
+  --color-txt: #FFFFFF;
+  --color-txt-secondary: #B0B3B3;
+  --color-txt-muted: #6B7070;
+
+  /* ===== Colors: Semantic ===== */
+  --color-error: #FF4757;
+  --color-divider: #3A4142;
+  --color-input-border: #3A4142;
+  --color-input-focus: #24EE89;
+  --color-favourite: #FF4757;
+
+  /* ===== Colors: Game Lobby Specific ===== */
+  --color-tab-active: #24EE89;
+  --color-tab-inactive: #B0B3B3;
+  --color-tab-underline: #24EE89;
+  --color-search-bg: #1E2020;
+  --color-new-badge-bg: #24EE89;
+  --color-new-badge-text: #1A1D1D;
+  --color-fav-unfilled: #FFFFFF;
+  --color-fav-filled: #FF4757;
+  --color-filter-chip-active-bg: #3A4142;
+
+  /* ===== Typography ===== */
+  --font-family: 'AvertaStd', 'Inter', system-ui, sans-serif;
+  --font-size-2xs: 10px;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+
+  /* ===== Spacing ===== */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+
+  /* ===== Border Radius ===== */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* ===== Shadows ===== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+  /* ===== Component: Search Box ===== */
+  --search-height: 44px;
+  --search-bg: var(--color-bg-input);
+  --search-border: 1px solid var(--color-divider);
+  --search-border-focus: 1px solid var(--color-input-focus);
+  --search-radius: var(--radius-md);
+  --search-font-size: var(--font-size-sm);
+  --search-padding: 0 12px;
+  --search-icon-color: var(--color-txt-muted);
+  --search-placeholder-color: var(--color-txt-muted);
+
+  /* ===== Component: Filter Select ===== */
+  --filter-select-height: 36px;
+  --filter-select-bg: var(--color-bg-card);
+  --filter-select-border: 1px solid #3A3D3D;
+  --filter-select-radius: var(--radius-md);
+  --filter-select-font-size: 13px;
+  --filter-select-label-color: var(--color-txt-secondary);
+  --filter-select-value-color: var(--color-txt);
+  --filter-select-arrow-color: var(--color-txt-muted);
+
+  /* ===== Component: Filter Chip (Tab) ===== */
+  --chip-font-size: var(--font-size-xs);
+  --chip-font-weight: 600;
+  --chip-color-inactive: var(--color-txt-secondary);
+  --chip-color-active: var(--color-brand);
+  --chip-bg-active: var(--color-filter-chip-active-bg);
+  --chip-padding: 6px 12px;
+  --chip-radius: var(--radius-md);
+
+  /* ===== Component: Game Card ===== */
+  --card-thumbnail-ratio: 1 / 1;
+  --card-thumbnail-radius: var(--radius-md);
+  --card-name-font-size: var(--font-size-xs);
+  --card-name-color: var(--color-txt);
+  --card-provider-font-size: var(--font-size-2xs);
+  --card-provider-color: var(--color-txt-muted);
+  --card-hover-scale: 1.05;
+  --card-hover-transition: transform 0.2s ease;
+  --card-gap-x: 8px;
+  --card-gap-y: 12px;
+  --card-new-badge-top: 6px;
+  --card-new-badge-left: 6px;
+  --card-fav-btn-top: 6px;
+  --card-fav-btn-right: 6px;
+
+  /* ===== Component: Page Header ===== */
+  --header-height: 56px;
+  --header-bg: var(--color-bg);
+  --header-title-size: var(--font-size-base);
+  --header-title-weight: 800;
+  --header-title-color: var(--color-txt);
+
+  /* ===== Component: Bottom Tab Bar ===== */
+  --tabbar-height: 64px;
+  --tabbar-bg: #323738;
+  --tabbar-active-color: var(--color-brand);
+  --tabbar-inactive-color: var(--color-txt-muted);
+  --tabbar-label-size: var(--font-size-2xs);
+
+  /* ===== Layout ===== */
+  --max-width-mobile: 430px;
+  --grid-columns: 3;
+  --grid-gap: 12px;
+  --page-padding-x: 16px;
+  --page-padding-bottom: 80px;
+  --content-padding-top: 12px;
+}

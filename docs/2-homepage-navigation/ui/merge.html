@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GO PLUS - Homepage & Navigation (1:1 Clone)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: { DEFAULT: '#232626', deep: '#1A1D1D', card: '#2A2D2D', hover: '#323738', layer4: '#323738' },
+            brand: { DEFAULT: '#24EE89', dark: '#1DBF6E', light: 'rgba(36,238,137,0.15)', end: '#9FE871' },
+            txt: { DEFAULT: '#FFFFFF', secondary: '#B0B3B3', muted: '#6B7070' },
+            divider: '#3A3D3D',
+            error: '#FF4757',
+            warning: '#FFA502',
+          },
+          fontFamily: {
+            sans: ['AvertaStd', 'Inter', 'system-ui', 'sans-serif'],
+          },
+          maxWidth: {
+            mobile: '430px',
+          },
+          fontSize: {
+            '2xs': '10px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1A1D1D; font-family: 'AvertaStd', 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* GET 1700 rainbow circle using the actual tab image */
+    .get1700-wrap {
+      position: relative;
+      width: 80px;
+      height: 70px;
+      margin-top: -30px;
+    }
+    .get1700-wrap img {
+      width: 100%;
+      transform: scale(1.35);
+      margin-top: -6px;
+      margin-left: 1px;
+      z-index: 9;
+      position: relative;
+    }
+    .get1700-bg {
+      position: absolute;
+      background-color: rgb(1, 68, 28);
+      width: 5.5rem;
+      height: 3rem;
+      top: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Sidebar */
+    .sidebar-overlay { transition: opacity 0.3s; pointer-events: none; }
+    .sidebar-overlay.active { pointer-events: auto; }
+    .sidebar-panel { transition: transform 0.3s ease-out; }
+
+    /* Smooth scroll for game grids */
+    .game-scroll {
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Section header icon styles */
+    .section-icon { width: 24px; height: 24px; flex-shrink: 0; }
+
+    /* Supplier grid item */
+    .supplier-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #323738;
+      border-radius: 8px;
+      height: 44px;
+      padding: 8px 12px;
+      position: relative;
+    }
+    .supplier-item.has-new::before {
+      content: 'NEW';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      background: #24EE89;
+      color: #000;
+      font-size: 8px;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 4px;
+      line-height: 1.2;
+    }
+
+    /* Social media buttons */
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    /* Bet table row */
+    .bet-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid #2A2D2D;
+      font-size: 14px;
+    }
+
+    /* Game card in horizontal grid */
+    .game-icon-card {
+      width: 56px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .game-icon-card img {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    .game-icon-card span {
+      font-size: 10px;
+      color: #B0B3B3;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 56px;
+      display: block;
+    }
+
+    /* Big trending game card */
+    .trending-card {
+      width: 142px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .trending-card img {
+      width: 142px;
+      height: 96px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    .trending-card .game-name {
+      font-size: 12px;
+      color: #fff;
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .trending-card .provider-name {
+      font-size: 10px;
+      color: #6B7070;
+    }
+
+    /* Recent Big Win marquee card */
+    .bigwin-card {
+      width: 140px;
+      flex-shrink: 0;
+      background: #323738;
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .bigwin-card img {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+    }
+
+    /* Banner carousel  */
+    .banner-slide {
+      min-width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* Tab bar active state */
+    .tab-active { color: #24EE89 !important; }
+    .tab-inactive { color: #6B7070; }
+
+    /* Jackpot glow */
+    @keyframes jackpotPulse {
+      0%, 100% { text-shadow: 0 0 10px rgba(36, 238, 137, 0.5); }
+      50% { text-shadow: 0 0 20px rgba(36, 238, 137, 0.8); }
+    }
+    .jackpot-amount { animation: jackpotPulse 2s infinite; }
+
+    /* Recent Big Win marquee scrolling */
+    @keyframes marqueeScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .marquee-track {
+      display: flex;
+      gap: 12px;
+      animation: marqueeScroll 20s linear infinite;
+      width: max-content;
+    }
+    .marquee-container {
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Banner carousel auto-play */
+    .banner-carousel {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+    .banner-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .banner-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6B7070;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .banner-dot.active {
+      background: #24EE89;
+      width: 16px;
+      border-radius: 3px;
+    }
+
+    /* GET 1700 rainbow rotation */
+    @keyframes rainbowRotate {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+    .get1700-wrap img {
+      animation: rainbowRotate 3s linear infinite;
+    }
+
+    /* Countdown timer pulse */
+    @keyframes countdownPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .countdown-timer { animation: countdownPulse 1s ease-in-out infinite; }
+
+    /* Hot Event pulse */
+    @keyframes hotEventPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    .hot-event-icon { animation: hotEventPulse 1.5s ease-in-out infinite; }
+
+    /* Game card hover effect */
+    .trending-card { transition: transform 0.2s ease; cursor: pointer; }
+    .trending-card:hover { transform: scale(1.05); }
+    .game-icon-card { transition: transform 0.2s ease; }
+    .game-icon-card:hover { transform: scale(1.1); }
+
+    /* Sign Up button gradient */
+    .btn-signup {
+      background: linear-gradient(90deg, #24EE89, #9FE871);
+      color: #000;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 0 16px;
+      height: 40px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Tabs for Latest Bet */
+    .bet-tab {
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .bet-tab.active {
+      background: #323738;
+      color: #fff;
+    }
+    .bet-tab:not(.active) {
+      color: #6B7070;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========================================
+     PAGE WRAPPER (Mobile 430px max)
+     Flex column layout: header(shrink-0) + main(flex-1 scroll) + nav(shrink-0)
+     All elements stay inside the 430px container, no fixed positioning needed.
+     ======================================== -->
+<div class="max-w-mobile mx-auto relative bg-bg flex flex-col h-screen overflow-hidden" id="app">
+
+  <!-- ========================================
+       HEADER (56px, shrink-0)
+       Stays at top of flex container, no fixed needed
+       ======================================== -->
+  <header class="shrink-0 z-[1000] h-14">
+    <div class="flex items-center h-full px-4 overflow-hidden" style="background: rgba(50, 55, 56, 0.85); backdrop-filter: blur(10px);">
+      <!-- Logo (real image from 1goplus.com) -->
+      <img src="https://1goplus.com/png/newlogo-a2586KU_.png" alt="logo" class="h-8 w-auto" style="min-width: 100px;">
+
+      <div class="flex-1"></div>
+
+      <!-- Hot Event icon -->
+      <div class="cursor-pointer mr-2" style="width: 40px; height: 44px; display: flex; align-items: center; justify-content: center;">
+        <img src="https://1goplus.com/png/hotevent-GYxqVDim.png" alt="Hot Event" style="width: 40px; height: 44px; object-fit: contain;">
+      </div>
+
+      <!-- Sign In (text button) -->
+      <button class="text-white font-extrabold text-base px-4 h-10 cursor-pointer bg-transparent border-none" style="font-weight: 800;">Sign In</button>
+
+      <!-- Sign Up (gradient button) -->
+      <button class="btn-signup">Sign Up</button>
+    </div>
+  </header>
+
+  <!-- ========================================
+       MAIN SCROLLABLE CONTENT (flex-1, scrolls independently)
+       No padding-top/bottom needed since header/nav are in the same flex container
+       ======================================== -->
+  <main class="flex-1 overflow-y-auto">
+
+    <!-- === SIGN UP BANNER (Green promotional) === -->
+    <div class="mx-4 mt-3 rounded-xl overflow-hidden cursor-pointer" style="background: linear-gradient(135deg, #1a5c2e 0%, #0d3a1a 100%); position: relative;">
+      <div class="flex items-center p-3">
+        <div class="flex-1">
+          <div class="text-white/70 text-xs">Secure and Fast</div>
+          <div class="text-white font-extrabold text-lg leading-tight mt-1">Sign Up & Get</div>
+          <div class="text-white font-extrabold text-2xl leading-tight">100 Bonuses</div>
+          <button class="mt-2 bg-brand text-black font-extrabold text-xs px-4 py-1.5 rounded-md cursor-pointer">Join Now</button>
+        </div>
+        <div class="w-32 h-24 flex-shrink-0">
+          <!-- Decorative casino imagery placeholder -->
+          <img src="https://1goplus.com/png/login-fWVrBuNX.png" alt="bonus" class="w-full h-full object-contain" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+
+    <!-- === JACKPOT OF THE DAY === -->
+    <div class="px-4 mt-4">
+      <div class="flex items-center h-8 mb-1.5">
+        <div class="flex items-center text-base font-extrabold text-white">
+          <!-- Trophy icon -->
+          <svg class="section-icon mr-2" viewBox="0 0 24 24" fill="none">
+            <path d="M7 4V2h10v2h3a1 1 0 011 1v3a4 4 0 01-3.5 3.97 5.002 5.002 0 01-3.5 3.87V18h3v2H7v-2h3v-3.16A5.002 5.002 0 016.5 11.97 4 4 0 015 8V5a1 1 0 011-1h1zm0 2H7v2a2 2 0 001.5 1.94L9 10V6H7zm10 0h-2v4l.5-.06A2 2 0 0017 8V6z" fill="#FFD700"/>
+          </svg>
+          Jackpot of the Day
+        </div>
+        <div class="flex-1"></div>
+        <span class="text-txt-secondary text-sm cursor-pointer flex items-center">
+          More
+          <svg class="w-4 h-4 ml-1 rotate-180 text-txt-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+        </span>
+      </div>
+
+      <!-- Jackpot Cards Row -->
+      <div class="flex gap-3">
+        <!-- VIP Money Pot -->
+        <div class="flex-1 rounded-xl p-4 relative" style="background: #323738;">
+          <div class="text-txt-secondary text-xs font-semibold">VIP Money Pot</div>
+          <div class="text-txt-muted text-2xs mt-1 countdown-timer" id="vip-countdown">5d:14h:13m:32s</div>
+          <div class="text-white font-extrabold text-lg mt-2">&#8377;0.00</div>
+        </div>
+        <!-- Daily Jackpot -->
+        <div class="flex-1 rounded-xl p-4 relative overflow-hidden" style="background: linear-gradient(135deg, #1a3a1e 0%, #0d2a12 100%);">
+          <div class="text-brand text-xs font-semibold">Daily Jackpot</div>
+          <div class="text-white font-extrabold text-lg mt-2 jackpot-amount">&#8377;10,91,442</div>
+          <div class="text-txt-secondary text-2xs mt-1">Winner</div>
+          <!-- Trophy image decoration -->
+          <img src="https://1goplus.com/png/trophy-B3u8sNrg-Bogwg3F_.png" alt="" class="absolute right-0 top-0 h-full opacity-30 pointer-events-none" onerror="this.style.display='none'">
+        </div>
+      </div>
+
+      <!-- Last Champion row -->
+      <div class="mt-2 flex items-center gap-2 rounded-lg p-2" style="background: #323738;">
+        <div class="w-8 h-8 rounded-full bg-brand/20 flex items-center justify-center">
+          <img src="https://1goplus.com/png/8-BgAWkeDv.png" alt="" class="w-8 h-8 rounded-full" onerror="this.textContent='O'">
+        </div>
+        <div class="flex-1">
+          <div class="text-txt-secondary text-2xs">Last Champion</div>
+          <div class="text-white text-xs font-bold">Omar</div>
+        </div>
+        <div class="text-right">
+          <div class="text-txt-secondary text-2xs">511813(0.0%)</div>
+          <div class="text-brand text-xs font-bold">&#8377;48622224.97</div>
+        </div>
+      </div>
+
+      <!-- My Turnover -->
+      <div class="mt-2 flex items-center justify-between rounded-lg p-3" style="background: #323738;">
+        <div>
+          <div class="text-txt-secondary text-xs">My Turnover</div>
+          <div class="text-white font-extrabold text-lg">0</div>
+        </div>
+        <button class="bg-brand text-black font-extrabold text-sm px-5 py-2 rounded-lg cursor-pointer">GO BET</button>
+      </div>
+    </div>
+
+    <!-- === TRENDING GAMES === -->
+    <div class="px-4 mt-4">
+      <div class="flex items-center h-8 mb-1.5">
+        <div class="flex items-center text-base font-extrabold text-white">Trending Games</div>
+      </div>
+      <div class="game-scroll hide-scrollbar flex gap-3">
+        <!-- Trending game cards with larger thumbnails (142x96) -->
+        <div class="trending-card">
+          <img src="https://1goplus.com/static/game/img/spribe/Aviator_251210_189.png" alt="Aviator">
+          <div class="game-name">Aviator</div>
+          <div class="provider-name">Spribe</div>
+        </div>
+        <div class="trending-card">
+          <img src="https://1goplus.com/static/game/img/jili/114.png" alt="Super Ace">
+          <div class="game-name">Super Ace</div>
+          <div class="provider-name">JILI</div>
+        </div>
+        <div class="trending-card">
+          <img src="https://1goplus.com/static/game/img/jili/EuropeanRoulette_251210_62.png" alt="European Roulette">
+          <div class="game-name">European Roulette</div>
+          <div class="provider-name">JILI</div>
+        </div>
+        <div class="trending-card">
+          <img src="https://1goplus.com/static/game/img/jili/7up7down_251210_69.png" alt="7up7down">
+          <div class="game-name">7up7down</div>
+          <div class="provider-name">JILI</div>
+        </div>
+        <div class="trending-card">
+          <img src="https://1goplus.com/static/game/img/evo/CrazyTime_251210_184.png" alt="Crazy Time">
+          <div class="game-name">Crazy Time</div>
+          <div class="provider-name">Evolution</div>
+        </div>
+        <div class="trending-card">
+          <img src="https://1goplus.com/static/game/img/jili/FortuneGems3_251210_156.png" alt="Fortune Gems 3">
+          <div class="game-name">Fortune Gems 3</div>
+          <div class="provider-name">JILI</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- === RECENT BIG WIN (Marquee Scrolling) === -->
+    <div class="px-4 mt-4">
+      <div class="flex items-center h-8 mb-1.5">
+        <div class="flex items-center text-base font-extrabold text-white">Recent Big Win</div>
+      </div>
+      <div class="marquee-container">
+      <div class="marquee-track">
+        <div class="bigwin-card">
+          <img src="https://1goplus.com/static/game/img/spribe/Aviator_251210_189.png" alt="">
+          <div class="text-white text-xs font-semibold text-center">Aviator</div>
+          <div class="text-brand text-xs font-bold">x 80.0</div>
+        </div>
+        <div class="bigwin-card">
+          <img src="https://1goplus.com/static/game/img/jili/FortuneGems3_251210_156.png" alt="">
+          <div class="text-white text-xs font-semibold text-center">Fortune Gems 3</div>
+          <div class="text-brand text-xs font-bold">x 50.0</div>
+        </div>
+        <div class="bigwin-card">
+          <img src="https://1goplus.com/static/game/img/jili/114.png" alt="">
+          <div class="text-white text-xs font-semibold text-center">Super Ace</div>
+          <div class="text-brand text-xs font-bold">x 61.9</div>
+        </div>
+        <div class="bigwin-card">
+          <img src="https://1goplus.com/static/game/img/jdb/351.png" alt="">
+          <div class="text-white text-xs font-semibold text-center">Tower Rush</div>
+          <div class="text-brand text-xs font-bold">x 119.0</div>
+        </div>
+        <div class="bigwin-card">
+          <img src="https://1goplus.com/static/game/img/jili/JhandiMunda_168_251113.png" alt="">
+          <div class="text-white text-xs font-semibold text-center">Jhandi Munda</div>
+          <div class="text-brand text-xs font-bold">x 60.0</div>
+        </div>
+        <!-- Duplicated for seamless loop -->
+        <div class="bigwin-card">
+          <img src="https://1goplus.com/static/game/img/spribe/Aviator_251210_189.png" alt="">
+          <div class="text-white text-xs font-semibold text-center">Aviator</div>
+          <div class="text-brand text-xs font-bold">x 80.0</div>
+        </div>
+        <div class="bigwin-card">
+          <img src="https://1goplus.com/static/game/img/jili/FortuneGems3_251210_156.png" alt="">
+          <div class="text-white text-xs font-semibold text-center">Fortune Gems 3</div>
+          <div class="text-brand text-xs font-bold">x 50.0</div>
+        </div>
+        <div class="bigwin-card">
+          <img src="https://1goplus.com/static/game/img/jili/114.png" alt="">
+          <div class="text-white text-xs font-semibold text-center">Super Ace</div>
+          <div class="text-brand text-xs font-bold">x 61.9</div>
+        </div>
+        <div class="bigwin-card">
+          <img src="https://1goplus.com/static/game/img/jdb/351.png" alt="">
+          <div class="text-white text-xs font-semibold text-center">Tower Rush</div>
+          <div class="text-brand text-xs font-bold">x 119.0</div>
+        </div>
+        <div class="bigwin-card">
+          <img src="https://1goplus.com/static/game/img/jili/JhandiMunda_168_251113.png" alt="">
+          <div class="text-white text-xs font-semibold text-center">Jhandi Munda</div>
+          <div class="text-brand text-xs font-bold">x 60.0</div>
+        </div>
+      </div><!-- /marquee-track -->
+      </div><!-- /marquee-container -->
+    </div>
+
+    <!-- === TABLE GAME Section === -->
+    <div class="px-4 mt-4">
+      <div class="flex items-center h-8 mb-1.5">
+        <!-- Table Game SVG icon from sprite -->
+        <svg class="section-icon mr-2" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="4" width="20" height="16" rx="2" fill="#24EE89" opacity="0.3"/>
+          <rect x="4" y="6" width="7" height="5" rx="1" fill="#24EE89"/>
+          <rect x="13" y="6" width="7" height="5" rx="1" fill="#B0B3B3"/>
+          <circle cx="7.5" cy="15.5" r="2.5" fill="#fff"/>
+          <circle cx="16.5" cy="15.5" r="2.5" fill="#FF4757"/>
+        </svg>
+        <div class="flex items-center text-base font-extrabold text-white">Table Game</div>
+        <div class="flex-1"></div>
+        <span class="text-brand text-sm font-semibold cursor-pointer flex items-center">
+          All
+          <svg class="w-4 h-4 ml-1 rotate-180 text-txt-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+        </span>
+      </div>
+      <!-- Horizontal scrollable game icon grid (56px icons) -->
+      <div class="game-scroll hide-scrollbar flex gap-3">
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/OR_480x630_GameID049_en-US.png" alt=""><span>Ludo Quick</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/158.png" alt=""><span>TeenPatti</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/545.png" alt=""><span>Rummy</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/57.png" alt=""><span>Andar Bahar</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/523.png" alt=""><span>Dragon Tiger</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jdb/349.png" alt=""><span>Blackjack</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/OR_480x630_GameID223_en-US.png" alt=""><span>Baccarat</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/33.png" alt=""><span>Sic Bo</span></div>
+      </div>
+    </div>
+
+    <!-- === SLOTS Section === -->
+    <div class="px-4 mt-4">
+      <div class="flex items-center h-8 mb-1.5">
+        <svg class="section-icon mr-2" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="2" width="18" height="20" rx="3" fill="#24EE89" opacity="0.3"/>
+          <rect x="5" y="6" width="4" height="8" rx="1" fill="#FFD700"/>
+          <rect x="10" y="6" width="4" height="8" rx="1" fill="#FF4757"/>
+          <rect x="15" y="6" width="4" height="8" rx="1" fill="#24EE89"/>
+          <rect x="8" y="17" width="8" height="3" rx="1.5" fill="#B0B3B3"/>
+        </svg>
+        <div class="flex items-center text-base font-extrabold text-white">Slots</div>
+        <div class="flex-1"></div>
+        <span class="text-brand text-sm font-semibold cursor-pointer flex items-center">
+          All
+          <svg class="w-4 h-4 ml-1 rotate-180 text-txt-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+        </span>
+      </div>
+      <div class="game-scroll hide-scrollbar flex gap-3">
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/156.png" alt=""><span>Fortune Gems 3</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jdb/351.png" alt=""><span>Tower Rush</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/448.png" alt=""><span>Cash Mania</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/504.png" alt=""><span>Ganesha Gold</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/OR_480x630_GameID153_en-US.png" alt=""><span>Treasure Chest</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/OR_480x630_GameID400_pt-BR.png" alt=""><span>Lucky Neko</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/20.png" alt=""><span>Boxing King</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/505.png" alt=""><span>Opera Dynasty</span></div>
+      </div>
+    </div>
+
+    <!-- === LIVE Section === -->
+    <div class="px-4 mt-4">
+      <div class="flex items-center h-8 mb-1.5">
+        <svg class="section-icon mr-2" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#24EE89" opacity="0.3"/>
+          <circle cx="12" cy="12" r="4" fill="#FF4757"/>
+          <rect x="10" y="2" width="4" height="4" rx="2" fill="#FFD700"/>
+        </svg>
+        <div class="flex items-center text-base font-extrabold text-white">Live</div>
+        <div class="flex-1"></div>
+        <span class="text-brand text-sm font-semibold cursor-pointer flex items-center">
+          All
+          <svg class="w-4 h-4 ml-1 rotate-180 text-txt-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+        </span>
+      </div>
+      <div class="game-scroll hide-scrollbar flex gap-3">
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/OR_480x630_GameID076_en-US.png" alt=""><span>Lightning Ball</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/OR_480x630_GameID045_en-US.png" alt=""><span>Bingo</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/OR_480x630_GameID067_en-US.png" alt=""><span>Color Game</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/OR_480x630_GameID137_en-US.png" alt=""><span>Sic Bo</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/158.png" alt=""><span>TeenPatti Live</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/57.png" alt=""><span>Andar Bahar</span></div>
+      </div>
+    </div>
+
+    <!-- === FISHING Section === -->
+    <div class="px-4 mt-4">
+      <div class="flex items-center h-8 mb-1.5">
+        <svg class="section-icon mr-2" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C8 2 4 6 4 10c0 5 8 12 8 12s8-7 8-12c0-4-4-8-8-8z" fill="#24EE89" opacity="0.3"/>
+          <path d="M15 8c0 2-1.5 4-3 5s-3-3-3-5a3 3 0 016 0z" fill="#24EE89"/>
+        </svg>
+        <div class="flex items-center text-base font-extrabold text-white">Fishing</div>
+        <div class="flex-1"></div>
+        <span class="text-brand text-sm font-semibold cursor-pointer flex items-center">
+          All
+          <svg class="w-4 h-4 ml-1 rotate-180 text-txt-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+        </span>
+      </div>
+      <div class="game-scroll hide-scrollbar flex gap-3">
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/541.png" alt=""><span>All-Star Fishing</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/543.png" alt=""><span>Mega Fishing</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jdb/6001.png" alt=""><span>Dragon Fishing</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/33.png" alt=""><span>Jackpot Fish</span></div>
+      </div>
+    </div>
+
+    <!-- === 1GO SELECTION Section (with tabs) === -->
+    <div class="px-4 mt-4">
+      <div class="flex items-center h-8 mb-1.5">
+        <div class="flex items-center text-base font-extrabold text-white">
+          <svg class="section-icon mr-2" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="2" width="20" height="20" rx="4" fill="#24EE89" opacity="0.3"/>
+            <text x="12" y="16" text-anchor="middle" fill="#24EE89" font-size="10" font-weight="800">1GO</text>
+          </svg>
+          1GO Selection
+        </div>
+        <div class="flex-1"></div>
+        <span class="text-brand text-sm font-semibold cursor-pointer flex items-center">
+          All
+          <svg class="w-4 h-4 ml-1 rotate-180 text-txt-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+        </span>
+      </div>
+      <!-- Sub-tabs for 1GO Selection -->
+      <div class="flex gap-2 mb-3 overflow-x-auto hide-scrollbar">
+        <div class="px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer bg-brand text-black whitespace-nowrap">1GO</div>
+        <div class="px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer bg-bg-hover text-txt-secondary whitespace-nowrap">Deposit</div>
+        <div class="px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer bg-bg-hover text-txt-secondary whitespace-nowrap">Cashier</div>
+        <div class="px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer bg-bg-hover text-txt-secondary whitespace-nowrap">Pay</div>
+        <div class="px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer bg-bg-hover text-txt-secondary whitespace-nowrap">Mega</div>
+      </div>
+      <div class="game-scroll hide-scrollbar flex gap-3">
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/156.png" alt=""><span>Fortune Gems 3</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/504.png" alt=""><span>Color Prediction</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/448.png" alt=""><span>Cash Mania</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jdb/351.png" alt=""><span>Tower Rush</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/OR_480x630_GameID049_en-US.png" alt=""><span>Ludo Quick</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/33.png" alt=""><span>Sic Bo</span></div>
+      </div>
+    </div>
+
+    <!-- === CRASH Section === -->
+    <div class="px-4 mt-4">
+      <div class="flex items-center h-8 mb-1.5">
+        <svg class="section-icon mr-2" viewBox="0 0 24 24" fill="none">
+          <path d="M3 20L12 4l9 16H3z" fill="#FF4757" opacity="0.5"/>
+          <path d="M12 10v4M12 16h.01" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div class="flex items-center text-base font-extrabold text-white">Crash</div>
+        <div class="flex-1"></div>
+        <span class="text-brand text-sm font-semibold cursor-pointer flex items-center">
+          All
+          <svg class="w-4 h-4 ml-1 rotate-180 text-txt-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+        </span>
+      </div>
+      <div class="game-scroll hide-scrollbar flex gap-3">
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/others/img_v0.0.03_aviator_1.png" alt=""><span>Aviator</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/others/chicken-road2.png" alt=""><span>Chicken Road 2</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/504.png" alt=""><span>Mines</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/448.png" alt=""><span>JetX</span></div>
+      </div>
+    </div>
+
+    <!-- === LOTTO Section === -->
+    <div class="px-4 mt-4">
+      <div class="flex items-center h-8 mb-1.5">
+        <svg class="section-icon mr-2" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#FFD700" opacity="0.3"/>
+          <circle cx="8" cy="10" r="2" fill="#FF4757"/>
+          <circle cx="16" cy="10" r="2" fill="#24EE89"/>
+          <circle cx="12" cy="16" r="2" fill="#0088FF"/>
+        </svg>
+        <div class="flex items-center text-base font-extrabold text-white">Lotto</div>
+        <div class="flex-1"></div>
+        <span class="text-brand text-sm font-semibold cursor-pointer flex items-center">
+          All
+          <svg class="w-4 h-4 ml-1 rotate-180 text-txt-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+        </span>
+      </div>
+      <div class="game-scroll hide-scrollbar flex gap-3">
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/OR_480x630_GameID049_en-US.png" alt=""><span>Ludo Quick</span></div>
+        <div class="game-icon-card"><img src="https://1goplus.com/static/game/icon/jili/OR_480x630_GameID223_en-US.png" alt=""><span>Bingo Ball</span></div>
+      </div>
+    </div>
+
+    <!-- === PAYMENT METHODS BAR === -->
+    <div class="px-4 mt-6">
+      <div class="flex items-center justify-center gap-4 py-3 rounded-lg" style="background: #323738;">
+        <span class="text-white text-sm font-bold">UPI</span>
+        <span style="color: #00BAF2;" class="text-sm font-bold">Paytm</span>
+        <span style="color: #5F259F;" class="text-sm font-bold">PhonePe</span>
+        <span class="text-sm font-bold"><span style="color:#4285F4;">G</span><span style="color:#EA4335;">P</span><span style="color:#FBBC04;">a</span><span style="color:#34A853;">y</span></span>
+        <span class="text-white text-sm font-bold">IMPS</span>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;">
+          <circle cx="12" cy="12" r="12" fill="#26A17B"/>
+          <path d="M13.4 12.36v-.01c-.08.01-.5.03-1.42.03-.73 0-1.25-.02-1.43-.03v.01c-2.81-.12-4.9-.63-4.9-1.22 0-.6 2.09-1.1 4.9-1.23V12c.18.01.71.05 1.44.05.87 0 1.33-.03 1.41-.05v-2.09c2.8.13 4.89.63 4.89 1.23 0 .59-2.09 1.1-4.89 1.22zm0-2.64V7.89h3.97V5.5H6.66v2.39h3.97v1.83c-3.17.15-5.55.78-5.55 1.55 0 .76 2.38 1.4 5.55 1.54v5.52h2.77v-5.52c3.16-.14 5.53-.78 5.53-1.54 0-.77-2.37-1.4-5.53-1.55z" fill="#fff"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- === 37% DEPOSIT CASHBACK BANNER === -->
+    <div class="mx-4 mt-6 rounded-xl overflow-hidden cursor-pointer" style="background: linear-gradient(90deg, #24EE89 0%, #0d6b32 100%);">
+      <div class="flex items-center justify-between p-4">
+        <div>
+          <div class="text-black font-extrabold text-base">37% First Deposit Cash Back</div>
+        </div>
+        <button class="bg-black text-brand font-extrabold text-sm px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap">Deposit Now</button>
+      </div>
+    </div>
+
+    <!-- === LATEST BET & RACE === -->
+    <div class="px-4 mt-4">
+      <div class="flex items-center h-8 mb-1.5">
+        <div class="flex items-center text-base font-extrabold text-white">Latest bet & Race</div>
+      </div>
+      <!-- Tabs -->
+      <div class="flex gap-2 mb-3 overflow-x-auto hide-scrollbar" style="background: #232626; border-radius: 8px;">
+        <div class="bet-tab active">Latest Bet</div>
+        <div class="bet-tab">High Roller</div>
+        <div class="bet-tab">High Multiplier</div>
+      </div>
+      <!-- Table Header -->
+      <div class="bet-row" style="border-bottom: 1px solid #3A3D3D; color: #6B7070; font-size: 12px; padding: 8px 16px;">
+        <span>Game</span>
+        <span>Player</span>
+        <span class="text-right">Profit</span>
+      </div>
+      <!-- Table Rows -->
+      <div class="bet-row">
+        <span class="text-white text-sm flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-2xs text-brand">A</span>
+          3 Blazing Volc...
+        </span>
+        <span class="text-txt-secondary text-sm">P32853136</span>
+        <span class="text-brand text-sm text-right font-semibold">+&#8377; 3.2</span>
+      </div>
+      <div class="bet-row">
+        <span class="text-white text-sm flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-2xs text-brand">P</span>
+          Pappu
+        </span>
+        <span class="text-txt-secondary text-sm">P33469084</span>
+        <span class="text-brand text-sm text-right font-semibold">+&#8377; 100</span>
+      </div>
+      <div class="bet-row">
+        <span class="text-white text-sm flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-2xs text-brand">P</span>
+          Pappu
+        </span>
+        <span class="text-txt-secondary text-sm">P30811547</span>
+        <span class="text-brand text-sm text-right font-semibold">+&#8377; 200</span>
+      </div>
+      <div class="bet-row">
+        <span class="text-white text-sm flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-2xs text-brand">C</span>
+          Chicken Road 2
+        </span>
+        <span class="text-txt-secondary text-sm">P34160863</span>
+        <span class="text-brand text-sm text-right font-semibold">+&#8377; 11</span>
+      </div>
+      <div class="bet-row">
+        <span class="text-white text-sm flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-2xs text-brand">P</span>
+          Pappu
+        </span>
+        <span class="text-txt-secondary text-sm">P33007494</span>
+        <span class="text-txt-muted text-sm text-right">0</span>
+      </div>
+      <div class="bet-row">
+        <span class="text-white text-sm flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-2xs text-brand">P</span>
+          Pappu
+        </span>
+        <span class="text-txt-secondary text-sm">P35056955</span>
+        <span class="text-brand text-sm text-right font-semibold">+&#8377; 100</span>
+      </div>
+      <div class="bet-row">
+        <span class="text-white text-sm flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-brand/20 flex items-center justify-center text-2xs text-brand">P</span>
+          Pappu
+        </span>
+        <span class="text-txt-secondary text-sm">P33127196</span>
+        <span class="text-brand text-sm text-right font-semibold">+&#8377; 100</span>
+      </div>
+    </div>
+
+    <!-- === SUPPLIER / PROVIDER GRID === -->
+    <div class="px-4 mt-6">
+      <div class="grid grid-cols-4 gap-2">
+        <!-- Row 1 - Top tier providers -->
+        <div class="supplier-item"><span class="text-white font-extrabold text-sm tracking-wider">JILI</span></div>
+        <div class="supplier-item"><span class="text-white font-extrabold text-xs tracking-wider">SPRIBE</span></div>
+        <div class="supplier-item"><span class="text-white font-extrabold text-sm">JDB</span></div>
+        <div class="supplier-item"><span class="text-txt-secondary text-xs font-semibold">&gt;Evolution</span></div>
+        <!-- Row 2 -->
+        <div class="supplier-item"><span class="text-white font-extrabold text-xs">iNOUT</span></div>
+        <div class="supplier-item"><span class="text-white text-2xs font-bold" style="letter-spacing: 2px;">HACKSAW<br><span class="text-2xs" style="letter-spacing: 3px;">GAMING</span></span></div>
+        <div class="supplier-item"><span class="text-white text-xs font-semibold">PG</span></div>
+        <div class="supplier-item"><span class="text-txt-secondary text-xs">playtech</span></div>
+        <!-- Row 3 -->
+        <div class="supplier-item"><span class="text-white text-2xs font-bold">TURBO<br>GAMES</span></div>
+        <div class="supplier-item"><span class="text-txt-secondary text-2xs">Microgaming</span></div>
+        <div class="supplier-item"><span class="text-txt-secondary text-2xs font-semibold">HABANERO</span></div>
+        <div class="supplier-item"><span class="text-txt-secondary text-xs">SA GAMING</span></div>
+        <!-- Row 4 - with NEW badges -->
+        <div class="supplier-item has-new"><span class="text-white font-bold text-xs">NETENT</span></div>
+        <div class="supplier-item has-new"><span class="text-white font-bold text-xs">NOLIMIT<br><span class="text-2xs">CITY</span></span></div>
+        <div class="supplier-item has-new"><span class="text-white font-bold text-xs" style="color: #FF4757;">RED TIGER</span></div>
+        <div class="supplier-item has-new"><span class="text-white text-2xs font-semibold">BigTime<br>Gaming</span></div>
+        <!-- Row 5 - with NEW badges -->
+        <div class="supplier-item has-new"><span class="text-brand text-2xs font-bold">TAP-A-ROO</span></div>
+        <div class="supplier-item has-new"><span class="text-brand font-bold text-sm" style="font-style: italic;">Ezugi</span></div>
+        <div class="supplier-item has-new"><span class="text-brand font-bold text-xs">CENi</span></div>
+      </div>
+    </div>
+
+    <!-- === COMMUNITY Section === -->
+    <div class="px-4 mt-6 mb-6">
+      <div class="flex items-center h-8 mb-3">
+        <div class="flex items-center text-base font-extrabold text-white">Community</div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <!-- Telegram -->
+        <div class="social-btn cursor-pointer" style="background: #229ED9;">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="white"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg>
+          <span class="font-bold">Telegram</span>
+        </div>
+        <!-- Facebook -->
+        <div class="social-btn cursor-pointer" style="background: #1877F2;">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <span class="font-bold">facebook</span>
+        </div>
+        <!-- Instagram -->
+        <div class="social-btn cursor-pointer" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          <span class="font-bold">Instagram</span>
+        </div>
+        <!-- WhatsApp -->
+        <div class="social-btn cursor-pointer" style="background: #25D366;">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          <span class="font-bold">WhatsApp</span>
+        </div>
+        <!-- YouTube -->
+        <div class="social-btn cursor-pointer" style="background: #FF0000;">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="white"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          <span class="font-bold">YouTube</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- === FOOTER === -->
+    <div class="px-4 pb-8 text-center">
+      <div class="flex items-center justify-center gap-4 text-txt-secondary text-sm">
+        <span class="cursor-pointer hover:text-white">Privacy Policy</span>
+        <span class="text-txt-muted">|</span>
+        <span class="cursor-pointer hover:text-white">Terms Of Service</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================
+       BOTTOM TAB BAR (64px, shrink-0)
+       Stays at bottom of flex container, no fixed needed
+       ======================================== -->
+  <nav class="shrink-0 z-[999]" style="background: #323738; height: 64px;">
+    <div class="flex items-end justify-around h-full px-2 pb-1">
+      <!-- Menu Tab -->
+      <div class="flex flex-col items-center justify-center cursor-pointer tab-active pt-1" onclick="toggleSidebar()">
+        <!-- Menu icon (4 squares pattern from 1goplus) -->
+        <svg class="w-6 h-6" viewBox="0 0 39 39" fill="currentColor">
+          <g clip-path="url(#menu-clip)" fill-rule="evenodd" clip-rule="evenodd">
+            <path d="M29.374 38.501a7.927 7.927 0 01-7.879-7.885v-8.353a.56.56 0 01.558-.558h8.353a7.925 7.925 0 017.921 7.836c0 4.948-4.009 8.96-8.953 8.96zm-20.544 0c-4.5 0-8.155-3.652-8.155-8.161.024-4.78 3.9-8.635 8.671-8.635h7.513a.563.563 0 01.6.516v7.735a8.589 8.589 0 01-8.629 8.545zm8.034-20.876H8.506A7.832 7.832 0 01.675 9.788c0-4.947 4.007-8.957 8.95-8.959a7.833 7.833 0 017.798 7.836v8.401a.562.562 0 01-.559.559z"/>
+            <path d="M22.053 17.625h7.183c5.016 0 9.084-4.072 9.084-9.091v-.043c0-4.233-3.426-7.662-7.65-7.662a9.178 9.178 0 00-9.133 9.182v6.995a.558.558 0 00.498.612h.018v.007z" fill="#24EE88"/>
+          </g>
+          <defs><clipPath id="menu-clip"><path fill="#fff" d="M0 0h39v39H0z"/></clipPath></defs>
+        </svg>
+        <span class="text-2xs mt-0.5 font-semibold">Menu</span>
+      </div>
+
+      <!-- Explore Tab -->
+      <div class="flex flex-col items-center justify-center cursor-pointer tab-inactive mr-3 pt-1">
+        <svg class="w-6 h-6" viewBox="0 0 155.9 132.3" fill="currentColor">
+          <rect x="93.3" y="88.4" width="14.4" height="45.6" rx="3.3" ry="3.3" transform="rotate(-42.9 100.567 111.202)" style="fill:#b2bdc0"/>
+          <path d="M54.9 19.8c-25.2 0-45.6 20.4-45.6 45.6S29.7 111 54.9 111s45.6-20.4 45.6-45.6-20.4-45.6-45.6-45.6zm0 76.1c-16.8 0-30.4-13.6-30.4-30.4s13.6-30.4 30.4-30.4 30.4 13.6 30.4 30.4-13.6 30.4-30.4 30.4z" style="fill:#24ee89;fill-rule:evenodd"/>
+          <path d="M116.2 1.5c-5.1 18.3-25.7 25.7-25.7 25.7 17.7 3.9 25.7 22.9 25.7 22.9s8-19 25.7-22.9c0 0-20.6-7.4-25.7-25.7z" style="fill-rule:evenodd;fill:#b3bec1"/>
+        </svg>
+        <span class="text-2xs mt-0.5 font-semibold">Explore</span>
+      </div>
+
+      <!-- GET 1700 (Center Tab - with image from original site) -->
+      <div class="flex flex-col items-center cursor-pointer" style="margin-top: -20px;">
+        <div class="get1700-wrap">
+          <img src="https://1goplus.com/png/tab200-etZXx2_Z.png" alt="GET 1700" onerror="this.parentElement.innerHTML='<div style=&quot;width:70px;height:70px;background:conic-gradient(#FF0000,#FF8800,#FFFF00,#24EE89,#0088FF,#8800FF,#FF0000);border-radius:50%;display:flex;align-items:center;justify-content:center;padding:3px;&quot;><div style=&quot;background:#323738;border-radius:50%;width:100%;height:100%;display:flex;align-items:center;justify-content:center;&quot;><span style=&quot;color:#24EE89;font-size:10px;font-weight:800;text-align:center;line-height:1.2;&quot;>GET<br>&#8377;1700</span></div></div>'">
+          <div class="get1700-bg"></div>
+        </div>
+        <span class="text-2xs font-semibold text-white" style="margin-top: -12px; position: relative; z-index: 10;">
+          GET <span style="color: #24EE89;">&#8377;</span><span style="color: #FFD700;">1700</span>
+        </span>
+      </div>
+
+      <!-- Raffle Tab -->
+      <div class="flex flex-col items-center justify-center cursor-pointer tab-inactive ml-3 pt-1 relative">
+        <svg class="w-5 h-5" viewBox="0 0 40 39" fill="currentColor">
+          <g clip-path="url(#raffle-clip)" fill-rule="evenodd" clip-rule="evenodd">
+            <path d="M.434 16.352c.079-.805.753-1.564 1.529-1.792.085-.026.31-.089.387-.089h26.974c.003.051-.019.097-.021.146-.015.416-.026.943 0 1.354.05.788.971.801 1.124.225.081-.305.042-1.221.03-1.579-.002-.049-.025-.095-.021-.146h6.8c.288 0 .785.238 1.021.404 1.285.908.804 2.382.897 3.72.002.03-.001.054-.02.079-.032.043-.243.17-.309.224-1.324 1.107-1.324 2.947 0 4.054.067.055.316.207.327.265v7.227c-.011.057-.26.209-.327.265-1.102.921-1.336 2.42-.455 3.582.219.289.492.5.779.72-.06 1.135.283 2.303-.592 3.209-.276.286-.914.656-1.321.656h-6.78v-.931c0-.717-1.152-.717-1.152 0v.931H2.35c-.077 0-.302-.063-.387-.088-.776-.229-1.45-.988-1.529-1.793v-2.036c.547-.365.989-.908 1.166-1.544.317-1.14-.195-2.261-1.166-2.903v-7.364c.547-.365.989-.908 1.166-1.543.317-1.141-.195-2.262-1.166-2.903.054-.754-.073-1.609 0-2.35z" fill="#B0B3B3"/>
+            <path d="M18.547 23.124c-.452-.882-.936-1.748-1.402-2.623l-.791-1.531c-.301-.489-.672-.371-.933.071-.415.708-.786 1.517-1.177 2.247-.322.6-.641 1.203-.984 1.79" fill="#24EE88"/>
+          </g>
+          <defs><clipPath id="raffle-clip"><path fill="#fff" d="M0 0h40v39H0z"/></clipPath></defs>
+        </svg>
+        <span class="text-2xs mt-0.5 font-semibold">Raffle</span>
+      </div>
+
+      <!-- Quest Tab -->
+      <div class="flex flex-col items-center justify-center cursor-pointer tab-inactive pt-1">
+        <svg class="w-7 h-7" viewBox="0 0 42.5 42.5" fill="currentColor">
+          <path d="M32.6 38.5H22.1V22.7h10.1c.6 0 1.5 1 1.5 1.6v13c0 .5-.3.9-.8 1.1h-.4zM10 38.5c-.6-.2-1-.7-1.1-1.3V24.5c0-.7.8-1.8 1.5-1.8h10.1v15.8H10z" fill="#b3bec1"/>
+          <path d="M2 20l9.5-6 3.2 5.2-9.5 6-.3-.2c-1-1.5-1.9-3.1-3-4.6V20z" fill="#24ee88"/>
+          <path d="M15 4.1c1.6.2 2.4 1.4 2.1 2.9-.8 3.7-7.4 7.8-11 8S1.8 12.3 4 9.9s4.3-1.2 6.3.2" fill="#b3bec1"/>
+          <path d="M40.5 20c-1 1.5-1.9 3.1-3 4.6l-.3.2-9.5-6 3.2-5.2 9.5 6v.4z" fill="#24ee88"/>
+          <path d="M27.5 4.1c-1.6.2-2.4 1.4-2.1 2.9.8 3.7 7.4 7.8 11 8s4.2-2.7 2-5.1-4.3-1.2-6.3.2" fill="#b3bec1"/>
+          <circle cx="21.3" cy="7.5" r="5" fill="#24ee88"/>
+        </svg>
+        <span class="text-2xs mt-0.5 font-semibold">Quest</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================================
+       SIDEBAR DRAWER MENU
+       ======================================== -->
+  <!-- Overlay (absolute within the 430px container) -->
+  <div id="sidebar-overlay" class="sidebar-overlay absolute inset-0 z-[1001] bg-black/60 opacity-0" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar Panel (absolute within the 430px container) -->
+  <div id="sidebar-panel" class="sidebar-panel absolute top-0 left-0 bottom-0 z-[1002] overflow-y-auto" style="width: 280px; background: #1A1D1D; transform: translateX(-100%);">
+    <!-- Sidebar promo banner -->
+    <div class="p-4 pt-6" style="background: linear-gradient(135deg, #1a5c2e 0%, #0d3a1a 100%);">
+      <div class="text-white/70 text-xs">Sign up & Get 100 Bonuses</div>
+    </div>
+
+    <!-- Game Categories -->
+    <div class="py-2">
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <!-- Favourite icon -->
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="none">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#24EE89"/>
+        </svg>
+        <span class="text-white text-sm font-semibold flex-1">Favourite!</span>
+        <svg class="w-4 h-4 text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#24EE89"><rect x="3" y="3" width="18" height="18" rx="3" opacity="0.3"/><path d="M8 8h8v2H8zm0 4h5v2H8z" fill="#24EE89"/></svg>
+        <span class="text-white text-sm font-semibold flex-1">Weekly Raffle</span>
+        <span class="text-2xs bg-error text-white px-1.5 py-0.5 rounded font-bold mr-2">Hot</span>
+        <svg class="w-4 h-4 text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#FF4757"><path d="M12 2L2 22h20L12 2zm0 6l6 12H6l6-12z" opacity="0.8"/></svg>
+        <span class="text-white text-sm font-semibold flex-1">Crash</span>
+        <span class="text-2xs bg-error text-white px-1.5 py-0.5 rounded font-bold mr-2">Hot</span>
+        <svg class="w-4 h-4 text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#24EE89"><circle cx="12" cy="12" r="10" opacity="0.3"/><circle cx="12" cy="12" r="4" fill="#FF4757"/></svg>
+        <span class="text-white text-sm font-semibold flex-1">Live</span>
+        <svg class="w-4 h-4 text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#24EE89"><rect x="3" y="2" width="18" height="20" rx="3" opacity="0.3"/><rect x="5" y="6" width="4" height="8" rx="1" fill="#FFD700"/><rect x="10" y="6" width="4" height="8" rx="1" fill="#FF4757"/></svg>
+        <span class="text-white text-sm font-semibold flex-1">Slots</span>
+        <svg class="w-4 h-4 text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#24EE89"><rect x="2" y="4" width="20" height="16" rx="2" opacity="0.3"/><circle cx="7.5" cy="12" r="2.5" fill="#fff"/><circle cx="16.5" cy="12" r="2.5" fill="#FF4757"/></svg>
+        <span class="text-white text-sm font-semibold flex-1">Table Game</span>
+        <svg class="w-4 h-4 text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#24EE89"><path d="M12 2C8 2 4 6 4 10c0 5 8 12 8 12s8-7 8-12c0-4-4-8-8-8z" opacity="0.3"/><path d="M15 8a3 3 0 01-6 0 3 3 0 016 0z" fill="#24EE89"/></svg>
+        <span class="text-white text-sm font-semibold flex-1">Fishing</span>
+        <svg class="w-4 h-4 text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#FFD700"><circle cx="12" cy="12" r="10" opacity="0.3"/><circle cx="8" cy="10" r="2" fill="#FF4757"/><circle cx="16" cy="10" r="2" fill="#24EE89"/><circle cx="12" cy="16" r="2" fill="#0088FF"/></svg>
+        <span class="text-white text-sm font-semibold flex-1">Lotto</span>
+        <svg class="w-4 h-4 text-txt-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-divider mx-4"></div>
+
+    <!-- Utility Items -->
+    <div class="py-2">
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#B0B3B3"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        <span class="text-white text-sm font-semibold">Notifications</span>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#FF8800"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/></svg>
+        <span class="text-white text-sm font-semibold">Hot Event</span>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#24EE89"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/></svg>
+        <span class="text-white text-sm font-semibold">Gift Code</span>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 1l3.22 6.636 7.28 1.082-5.25 5.194 1.24 7.338L12 17.77l-6.49 3.48 1.24-7.338L1.5 8.718l7.28-1.082z"/></svg>
+        <span class="text-white text-sm font-semibold">VIP Club</span>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#24EE89"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        <span class="text-white text-sm font-semibold">Affiliate</span>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#24EE89"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <span class="text-white text-sm font-semibold">GET &#8377;1700</span>
+      </div>
+
+      <div class="sidebar-item flex items-center px-4 py-3 cursor-pointer hover:bg-bg-hover">
+        <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="#24EE89"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+        <span class="text-white text-sm font-semibold">Live Support</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ========================================
+     JAVASCRIPT - Interactive behavior
+     ======================================== -->
+<script>
+  // Sidebar toggle
+  function toggleSidebar() {
+    const overlay = document.getElementById('sidebar-overlay');
+    const panel = document.getElementById('sidebar-panel');
+    const isOpen = panel.style.transform === 'translateX(0px)';
+
+    if (isOpen) {
+      panel.style.transform = 'translateX(-100%)';
+      overlay.style.opacity = '0';
+      overlay.classList.remove('active');
+    } else {
+      panel.style.transform = 'translateX(0px)';
+      overlay.style.opacity = '1';
+      overlay.classList.add('active');
+    }
+  }
+
+  // Tab switching for Latest Bet section
+  document.querySelectorAll('.bet-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.bet-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Jackpot counter animation - slowly incrementing number
+  (function() {
+    const jackpotEl = document.querySelector('.jackpot-amount');
+    if (!jackpotEl) return;
+    let amount = 1091442;
+    setInterval(() => {
+      amount += Math.floor(Math.random() * 50) + 10;
+      jackpotEl.innerHTML = '&#8377;' + amount.toLocaleString('en-IN');
+    }, 3000);
+  })();
+
+  // VIP Money Pot countdown timer
+  (function() {
+    const el = document.getElementById('vip-countdown');
+    if (!el) return;
+    let totalSec = 5 * 86400 + 14 * 3600 + 13 * 60 + 32;
+    setInterval(() => {
+      totalSec--;
+      if (totalSec < 0) totalSec = 6 * 86400;
+      const d = Math.floor(totalSec / 86400);
+      const h = Math.floor((totalSec % 86400) / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      el.textContent = d + 'd:' + String(h).padStart(2,'0') + 'h:' + String(m).padStart(2,'0') + 'm:' + String(s).padStart(2,'0') + 's';
+    }, 1000);
+  })();
+</script>
+
+</body>
+</html>

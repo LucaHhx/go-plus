@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GO PLUS - Wallet & Payment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: { DEFAULT: '#232626', deep: '#1A1D1D', card: '#2A2D2D', hover: '#333636' },
+            brand: { DEFAULT: '#24EE89', dark: '#1DBF6E' },
+            txt: { DEFAULT: '#FFFFFF', secondary: '#B0B3B3', muted: '#6B7070' },
+            border: '#3A3D3D',
+            error: '#FF4757',
+            warning: '#FFA502',
+          },
+          fontFamily: { sans: ['AvertaStd', 'Inter', 'system-ui', 'sans-serif'] },
+          maxWidth: { mobile: '430px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1A1D1D; font-family: 'Inter', system-ui, sans-serif; }
+    input:focus, select:focus { outline: none; border-color: #24EE89; }
+    .preview-tabs { position: sticky; top: 0; z-index: 100; background: #111; padding: 8px 16px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .preview-tab { padding: 6px 16px; border-radius: 6px; background: #333; color: #B0B3B3; cursor: pointer; font-size: 13px; font-weight: 600; border: none; }
+    .preview-tab.active { background: #24EE89; color: #1A1D1D; }
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body>
+
+<!-- PREVIEW TABS -->
+<div class="preview-tabs">
+  <button class="preview-tab active" onclick="showPage('deposit')">Deposit</button>
+  <button class="preview-tab" onclick="showPage('withdraw')">Withdraw</button>
+  <button class="preview-tab" onclick="showPage('transactions')">Transactions</button>
+</div>
+
+<!-- ========================================
+     PAGE: DEPOSIT
+     ======================================== -->
+<div id="page-deposit" class="page-section active">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-bg-deep h-14 flex items-center px-4">
+      <button class="w-8 h-8 flex items-center justify-center cursor-pointer">
+        <svg class="w-5 h-5 text-txt" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 class="flex-1 text-center text-txt font-bold text-base">Deposit</h1>
+      <button class="w-8 h-8 flex items-center justify-center cursor-pointer" onclick="showPage('transactions')">
+        <svg class="w-5 h-5 text-txt-secondary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </button>
+    </header>
+
+    <div class="px-4 pb-8">
+      <!-- Balance -->
+      <div class="text-center py-6">
+        <p class="text-txt-secondary text-sm mb-1">Available Balance</p>
+        <p class="text-txt text-3xl font-extrabold">₹0.00</p>
+      </div>
+
+      <!-- Payment Methods -->
+      <h3 class="text-txt text-sm font-semibold mb-3">Select Payment Method</h3>
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <!-- BHIM UPI (selected) -->
+        <div class="flex items-center gap-3 bg-bg-card border-2 border-brand rounded-lg px-3 py-3 cursor-pointer">
+          <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
+            <span class="text-blue-800 font-bold text-xs">UPI</span>
+          </div>
+          <span class="text-txt text-sm font-semibold">BHIM UPI</span>
+        </div>
+        <!-- Paytm -->
+        <div class="flex items-center gap-3 bg-bg-card border-2 border-border rounded-lg px-3 py-3 cursor-pointer hover:border-brand/50 transition-colors">
+          <div class="w-10 h-10 rounded-lg bg-[#00BAF2] flex items-center justify-center flex-shrink-0">
+            <span class="text-white font-bold text-xs">Pay</span>
+          </div>
+          <span class="text-txt text-sm font-semibold">Paytm</span>
+        </div>
+        <!-- Google Pay -->
+        <div class="flex items-center gap-3 bg-bg-card border-2 border-border rounded-lg px-3 py-3 cursor-pointer hover:border-brand/50 transition-colors">
+          <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
+            <span class="font-bold text-xs">
+              <span class="text-blue-500">G</span><span class="text-red-500">P</span><span class="text-yellow-500">a</span><span class="text-green-500">y</span>
+            </span>
+          </div>
+          <span class="text-txt text-sm font-semibold">Google Pay</span>
+        </div>
+        <!-- Amazon Pay -->
+        <div class="flex items-center gap-3 bg-bg-card border-2 border-border rounded-lg px-3 py-3 cursor-pointer hover:border-brand/50 transition-colors">
+          <div class="w-10 h-10 rounded-lg bg-[#FF9900] flex items-center justify-center flex-shrink-0">
+            <span class="text-white font-bold text-xs">AMZ</span>
+          </div>
+          <span class="text-txt text-sm font-semibold">Amazon Pay</span>
+        </div>
+      </div>
+
+      <!-- Amount Input -->
+      <h3 class="text-txt text-sm font-semibold mb-3">Enter Amount</h3>
+      <div class="flex items-center bg-bg-card border border-border rounded-lg h-14 px-4 mb-2">
+        <span class="text-txt-secondary text-2xl font-bold mr-2">₹</span>
+        <input type="number" placeholder="0" class="flex-1 bg-transparent text-txt text-2xl font-extrabold text-center border-none">
+      </div>
+      <p class="text-txt-muted text-xs mb-4">Minimum: ₹100</p>
+
+      <!-- Quick Amounts -->
+      <div class="grid grid-cols-4 gap-2 mb-6">
+        <button class="h-10 bg-bg-card border border-border rounded-lg text-txt-secondary text-sm font-semibold cursor-pointer hover:bg-bg-hover hover:text-txt transition-colors">₹100</button>
+        <button class="h-10 bg-brand rounded-lg text-bg-deep text-sm font-bold cursor-pointer">₹500</button>
+        <button class="h-10 bg-bg-card border border-border rounded-lg text-txt-secondary text-sm font-semibold cursor-pointer hover:bg-bg-hover hover:text-txt transition-colors">₹1,000</button>
+        <button class="h-10 bg-bg-card border border-border rounded-lg text-txt-secondary text-sm font-semibold cursor-pointer hover:bg-bg-hover hover:text-txt transition-colors">₹5,000</button>
+      </div>
+
+      <!-- Deposit Button -->
+      <button class="w-full h-11 bg-brand text-bg-deep font-bold text-base rounded-lg cursor-pointer hover:bg-brand-dark transition-colors">
+        Deposit
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     PAGE: WITHDRAW
+     ======================================== -->
+<div id="page-withdraw" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <header class="sticky top-0 z-40 bg-bg-deep h-14 flex items-center px-4">
+      <button class="w-8 h-8 flex items-center justify-center cursor-pointer">
+        <svg class="w-5 h-5 text-txt" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 class="flex-1 text-center text-txt font-bold text-base">Withdraw</h1>
+      <div class="w-8"></div>
+    </header>
+
+    <div class="px-4 pb-8">
+      <!-- Balance -->
+      <div class="py-6">
+        <div class="text-center">
+          <p class="text-txt-secondary text-sm mb-1">Available Balance</p>
+          <p class="text-txt text-3xl font-extrabold">₹1,250.00</p>
+        </div>
+        <div class="flex justify-center mt-2">
+          <div class="bg-bg-card rounded-full px-3 py-1">
+            <span class="text-txt-muted text-xs">Bonus: ₹100.00</span>
+            <span class="text-txt-muted text-[10px] ml-1">(not withdrawable)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amount Input -->
+      <h3 class="text-txt text-sm font-semibold mb-3">Withdrawal Amount</h3>
+      <div class="flex items-center bg-bg-card border border-border rounded-lg h-14 px-4 mb-2">
+        <span class="text-txt-secondary text-2xl font-bold mr-2">₹</span>
+        <input type="number" placeholder="0" value="200" class="flex-1 bg-transparent text-txt text-2xl font-extrabold text-center border-none">
+      </div>
+      <div class="flex justify-between mb-6">
+        <p class="text-txt-muted text-xs">Minimum: ₹200</p>
+        <p class="text-txt-muted text-xs">Maximum: ₹50,000</p>
+      </div>
+
+      <!-- Payment Method Tabs -->
+      <div class="flex gap-2 mb-4">
+        <button class="flex-1 h-10 bg-brand text-bg-deep font-bold text-sm rounded-lg cursor-pointer">UPI</button>
+        <button class="flex-1 h-10 bg-bg-card text-txt-secondary font-semibold text-sm rounded-lg border border-border cursor-pointer hover:bg-bg-hover transition-colors">Bank Transfer</button>
+      </div>
+
+      <!-- UPI ID Input -->
+      <div class="mb-6">
+        <label class="text-txt-secondary text-sm mb-2 block">UPI ID</label>
+        <div class="flex items-center bg-bg-card border border-border rounded-lg h-12 px-4">
+          <input type="text" placeholder="username@upi" class="flex-1 bg-transparent text-txt text-sm border-none">
+        </div>
+      </div>
+
+      <!-- Withdraw Button -->
+      <button class="w-full h-11 bg-brand text-bg-deep font-bold text-base rounded-lg cursor-pointer hover:bg-brand-dark transition-colors">
+        Withdraw
+      </button>
+
+      <!-- Instant withdrawal note -->
+      <p class="text-center text-brand text-xs mt-3 font-semibold">Instant Withdrawal - Get your money fast!</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     PAGE: TRANSACTIONS
+     ======================================== -->
+<div id="page-transactions" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <header class="sticky top-0 z-40 bg-bg-deep h-14 flex items-center px-4">
+      <button class="w-8 h-8 flex items-center justify-center cursor-pointer">
+        <svg class="w-5 h-5 text-txt" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 class="flex-1 text-center text-txt font-bold text-base">Transactions</h1>
+      <div class="w-8"></div>
+    </header>
+
+    <!-- Filter Tabs -->
+    <div class="px-4 overflow-x-auto hide-scrollbar">
+      <div class="flex gap-2 py-3 min-w-max">
+        <button class="px-4 py-1.5 rounded-full bg-brand text-bg-deep text-xs font-bold cursor-pointer">All</button>
+        <button class="px-4 py-1.5 rounded-full bg-bg-card text-txt-secondary text-xs font-semibold cursor-pointer hover:bg-bg-hover transition-colors">Deposit</button>
+        <button class="px-4 py-1.5 rounded-full bg-bg-card text-txt-secondary text-xs font-semibold cursor-pointer hover:bg-bg-hover transition-colors">Withdraw</button>
+        <button class="px-4 py-1.5 rounded-full bg-bg-card text-txt-secondary text-xs font-semibold cursor-pointer hover:bg-bg-hover transition-colors">Bet</button>
+        <button class="px-4 py-1.5 rounded-full bg-bg-card text-txt-secondary text-xs font-semibold cursor-pointer hover:bg-bg-hover transition-colors">Cashback</button>
+      </div>
+    </div>
+
+    <!-- Transaction List -->
+    <div class="px-4 pb-8">
+      <!-- Deposit - Completed -->
+      <div class="flex items-center gap-3 py-3 border-b border-border/50">
+        <div class="w-9 h-9 rounded-full bg-brand/15 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-brand" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-txt text-sm font-semibold">UPI Deposit</p>
+          <p class="text-txt-muted text-xs">2026-03-04 14:30</p>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <p class="text-brand text-sm font-bold">+₹500.00</p>
+          <span class="inline-block bg-brand/15 text-brand text-[10px] font-bold px-1.5 py-0.5 rounded">Completed</span>
+        </div>
+      </div>
+
+      <!-- Withdrawal - Pending -->
+      <div class="flex items-center gap-3 py-3 border-b border-border/50">
+        <div class="w-9 h-9 rounded-full bg-error/15 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-error" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-txt text-sm font-semibold">UPI Withdrawal</p>
+          <p class="text-txt-muted text-xs">2026-03-04 12:15</p>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <p class="text-error text-sm font-bold">-₹200.00</p>
+          <span class="inline-block bg-warning/15 text-warning text-[10px] font-bold px-1.5 py-0.5 rounded">Pending</span>
+        </div>
+      </div>
+
+      <!-- Bet -->
+      <div class="flex items-center gap-3 py-3 border-b border-border/50">
+        <div class="w-9 h-9 rounded-full bg-bg-hover flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-txt-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-txt text-sm font-semibold">Aviator - Bet</p>
+          <p class="text-txt-muted text-xs">2026-03-04 11:45</p>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <p class="text-txt-secondary text-sm font-bold">-₹50.00</p>
+        </div>
+      </div>
+
+      <!-- Win -->
+      <div class="flex items-center gap-3 py-3 border-b border-border/50">
+        <div class="w-9 h-9 rounded-full bg-brand/15 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-txt text-sm font-semibold">Aviator - Win</p>
+          <p class="text-txt-muted text-xs">2026-03-04 11:45</p>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <p class="text-brand text-sm font-bold">+₹96.00</p>
+        </div>
+      </div>
+
+      <!-- Cashback -->
+      <div class="flex items-center gap-3 py-3 border-b border-border/50">
+        <div class="w-9 h-9 rounded-full bg-brand/15 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-txt text-sm font-semibold">Welcome Bonus</p>
+          <p class="text-txt-muted text-xs">2026-03-04 10:00</p>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <p class="text-brand text-sm font-bold">+₹100.00</p>
+          <span class="inline-block bg-brand/15 text-brand text-[10px] font-bold px-1.5 py-0.5 rounded">Bonus</span>
+        </div>
+      </div>
+
+      <!-- Withdrawal - Rejected -->
+      <div class="flex items-center gap-3 py-3 border-b border-border/50">
+        <div class="w-9 h-9 rounded-full bg-error/15 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-error" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-txt text-sm font-semibold">Bank Withdrawal</p>
+          <p class="text-txt-muted text-xs">2026-03-03 16:20</p>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <p class="text-error text-sm font-bold">-₹1,000.00</p>
+          <span class="inline-block bg-error/15 text-error text-[10px] font-bold px-1.5 py-0.5 rounded">Rejected</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function showPage(page) {
+    document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.preview-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+</script>
+
+</body>
+</html>

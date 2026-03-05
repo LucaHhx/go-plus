@@ -1,0 +1,14 @@
+# Binary
+server
+
+# Data
+data/
+*.db
+
+# Logs
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp

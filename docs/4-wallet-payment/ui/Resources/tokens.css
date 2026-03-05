@@ -1,0 +1,35 @@
+/**
+ * Design Tokens -- GO PLUS 钱包与支付
+ * 继承全局设计系统 (docs/2-homepage-navigation/ui/Resources/tokens.css)
+ * 此文件仅包含钱包模块的特有 tokens
+ */
+
+:root {
+  /* ===== 钱包特有色值 ===== */
+  --color-deposit: #24EE89;           /* 充值标记 (绿色, 向上箭头, 正金额) */
+  --color-withdraw: #FF4757;          /* 提现标记 (红色, 向下箭头, 负金额) */
+  --color-pending: #FFA502;           /* 处理中状态 */
+  --color-completed: #24EE89;         /* 已完成状态 */
+  --color-rejected: #FF4757;          /* 已拒绝状态 */
+  --color-bonus: rgba(36, 238, 137, 0.15); /* Bonus 标签背景 */
+
+  /* ===== 支付方式品牌色 ===== */
+  --color-upi: #4B5EAA;
+  --color-paytm: #00BAF2;
+  --color-googlepay-blue: #4285F4;
+  --color-googlepay-red: #EA4335;
+  --color-googlepay-yellow: #FBBC04;
+  --color-googlepay-green: #34A853;
+  --color-amazonpay: #FF9900;
+
+  /* ===== 组件: 金额输入框 ===== */
+  --amount-input-height: 56px;
+  --amount-input-font-size: 24px;
+
+  /* ===== 组件: 快捷金额按钮 ===== */
+  --quick-amount-height: 40px;
+
+  /* ===== 组件: 交易记录项 ===== */
+  --tx-icon-size: 36px;
+  --tx-status-font-size: 10px;
+}
