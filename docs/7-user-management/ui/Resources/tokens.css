@@ -1,0 +1,145 @@
+/**
+ * Design Tokens -- GO PLUS User Management
+ * 继承 1-user-system 全局设计系统，新增用户管理模块特有的组件 token
+ * 前端可直接引用，也可通过 Tailwind 配置使用
+ */
+
+:root {
+  /* ===== Colors: Background (继承全局) ===== */
+  --color-bg: #232626;
+  --color-bg-deep: #1A1D1D;
+  --color-bg-card: #2A2D2D;
+  --color-bg-hover: #323738;
+  --color-bg-input: #1E2121;
+
+  /* ===== Colors: Brand (继承全局) ===== */
+  --color-brand: #24EE89;
+  --color-brand-dark: #1DBF6E;
+  --color-brand-end: #9FE871;
+
+  /* ===== Colors: Text (继承全局) ===== */
+  --color-txt: #FFFFFF;
+  --color-txt-secondary: #B0B3B3;
+  --color-txt-muted: #6B7070;
+
+  /* ===== Colors: Semantic (继承全局) ===== */
+  --color-error: #FF4757;
+  --color-warning: #FFA502;
+  --color-success: #24EE89;
+  --color-divider: #3A4142;
+  --color-input-border: #3A4142;
+  --color-input-focus: #24EE89;
+
+  /* ===== Colors: Danger (登出/解绑操作) ===== */
+  --color-danger: #FF4757;
+  --color-danger-hover: #FF6B7A;
+
+  /* ===== Typography (继承全局) ===== */
+  --font-family: 'AvertaStd', 'Inter', system-ui, sans-serif;
+  --font-size-2xs: 10px;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+
+  /* ===== Spacing (继承全局) ===== */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+
+  /* ===== Border Radius (继承全局) ===== */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* ===== Shadows (继承全局) ===== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+  /* ===== Component: Input (继承全局) ===== */
+  --input-height: 48px;
+  --input-bg: var(--color-bg-input);
+  --input-border: 1px solid var(--color-input-border);
+  --input-border-focus: 1px solid var(--color-input-focus);
+  --input-border-error: 1px solid var(--color-error);
+  --input-radius: var(--radius-md);
+  --input-font-size: var(--font-size-sm);
+  --input-padding: 0 12px;
+  --input-transition: border-color 0.2s ease;
+
+  /* ===== Component: Button (继承全局) ===== */
+  --btn-height: 48px;
+  --btn-radius: var(--radius-md);
+  --btn-primary-bg: linear-gradient(90deg, var(--color-brand), var(--color-brand-end));
+  --btn-primary-color: #000000;
+  --btn-primary-font-size: var(--font-size-base);
+  --btn-primary-font-weight: 800;
+
+  /* ===== Layout (继承全局) ===== */
+  --max-width-mobile: 430px;
+  --header-height: 56px;
+  --header-bg: rgba(50, 55, 56, 0.85);
+  --form-padding-x: 16px;
+  --page-padding-bottom: 32px;
+
+  /* ===== Component: Page Header (新增) ===== */
+  --page-header-height: 56px;
+  --page-header-bg: var(--color-bg-deep);
+  --page-header-title-size: var(--font-size-base);
+  --page-header-title-weight: 600;
+
+  /* ===== Component: Avatar (新增) ===== */
+  --avatar-size-sm: 48px;
+  --avatar-size-lg: 80px;
+  --avatar-bg: var(--color-bg-hover);
+  --avatar-border: 3px solid var(--color-brand);
+  --avatar-edit-size: 28px;
+  --avatar-edit-bg: var(--color-brand);
+
+  /* ===== Component: Info Row (新增) ===== */
+  --info-row-height: 48px;
+  --info-row-label-color: var(--color-txt-secondary);
+  --info-row-value-color: var(--color-txt);
+  --info-row-border: 1px solid rgba(58, 65, 66, 0.5);
+
+  /* ===== Component: Section Card (新增) ===== */
+  --section-card-bg: var(--color-bg-card);
+  --section-card-radius: var(--radius-lg);
+  --section-card-padding: 16px;
+  --section-title-size: var(--font-size-sm);
+  --section-title-color: var(--color-txt-secondary);
+  --section-title-weight: 600;
+
+  /* ===== Component: Logout Button (新增) ===== */
+  --logout-btn-height: 48px;
+  --logout-btn-bg: rgba(255, 71, 87, 0.1);
+  --logout-btn-color: var(--color-danger);
+  --logout-btn-radius: var(--radius-md);
+  --logout-btn-font-size: var(--font-size-sm);
+  --logout-btn-font-weight: 600;
+
+  /* ===== Component: Confirm Dialog (新增) ===== */
+  --dialog-overlay-bg: rgba(0, 0, 0, 0.6);
+  --dialog-bg: var(--color-bg-card);
+  --dialog-radius: var(--radius-lg);
+  --dialog-padding: 24px;
+  --dialog-max-width: 320px;
+  --dialog-title-size: var(--font-size-lg);
+  --dialog-title-weight: 600;
+  --dialog-desc-size: var(--font-size-sm);
+  --dialog-desc-color: var(--color-txt-secondary);
+
+  /* ===== Component: SideDrawer User Area (新增) ===== */
+  --drawer-user-padding: 16px;
+  --drawer-user-avatar-size: var(--avatar-size-sm);
+  --drawer-user-name-size: var(--font-size-base);
+  --drawer-user-phone-size: var(--font-size-xs);
+}

@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GO PLUS - User Management Design (Profile / Security / SideDrawer / Dialogs)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: { DEFAULT: '#232626', deep: '#1A1D1D', card: '#2A2D2D', hover: '#323738', input: '#1E2121' },
+            brand: { DEFAULT: '#24EE89', dark: '#1DBF6E', end: '#9FE871' },
+            txt: { DEFAULT: '#FFFFFF', secondary: '#B0B3B3', muted: '#6B7070' },
+            divider: '#3A4142',
+            error: '#FF4757',
+            danger: '#FF4757',
+            warning: '#FFA502',
+            success: '#24EE89',
+          },
+          fontFamily: { sans: ['AvertaStd', 'Inter', 'system-ui', 'sans-serif'] },
+          maxWidth: { mobile: '430px' },
+          fontSize: { '2xs': '10px' }
+        }
+      }
+    }
+  </script>
+  <!--
+    ==================== 资源规则 ====================
+    禁止使用外部 URL 引用本地应有的资源（图标、图片、logo 等）。
+    所有本地资源必须放在 Resources/ 目录并使用相对路径引用。
+    示例:
+      正确: <img src="Resources/icons/logo.svg" />
+      错误: <img src="https://example.com/logo.svg" />
+    ================================================
+  -->
+  <style>
+    /* ===== Reset ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1A1D1D; font-family: 'AvertaStd', 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+    /* ===== Preview Tab Switcher (design review only) ===== */
+    .preview-tabs { position: sticky; top: 0; z-index: 9999; background: #111; padding: 8px 12px; display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; border-bottom: 1px solid #333; }
+    .preview-tab { padding: 6px 12px; border-radius: 6px; background: #333; color: #B0B3B3; cursor: pointer; font-size: 12px; font-weight: 600; border: none; white-space: nowrap; }
+    .preview-tab.active { background: #24EE89; color: #1A1D1D; }
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    /* ===== Page Header ===== */
+    .page-header {
+      position: sticky; top: 0; z-index: 50;
+      height: 56px;
+      background: #1A1D1D;
+      display: flex; align-items: center;
+      padding: 0 16px;
+      border-bottom: 1px solid rgba(58, 65, 66, 0.5);
+    }
+    .page-header .back-btn {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; margin-left: -8px;
+    }
+    .page-header .title {
+      font-size: 16px; font-weight: 600; color: #fff; margin-left: 4px;
+    }
+
+    /* ===== Form Input ===== */
+    .form-input {
+      display: flex; align-items: center;
+      background: #1E2121;
+      border: 1px solid #3A4142;
+      border-radius: 8px;
+      height: 48px;
+      padding: 0 12px;
+      transition: border-color 0.2s ease;
+    }
+    .form-input:focus-within { border-color: #24EE89; }
+    .form-input.error { border-color: #FF4757; }
+    .form-input input {
+      flex: 1; min-width: 0;
+      background: transparent; border: none; outline: none;
+      color: #fff; font-size: 14px; line-height: 48px; height: 100%;
+    }
+    .form-input input::placeholder { color: #6B7070; }
+    .form-input .icon-btn {
+      flex-shrink: 0; width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #6B7070;
+    }
+    .error-text { color: #FF4757; font-size: 12px; margin-top: 4px; padding-left: 2px; }
+
+    /* ===== Primary Button ===== */
+    .btn-primary {
+      width: 100%; height: 48px;
+      border: none; border-radius: 8px;
+      background: linear-gradient(90deg, #24EE89, #9FE871);
+      color: #000; font-size: 16px; font-weight: 800;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      letter-spacing: 0.5px;
+    }
+    .btn-primary:active { opacity: 0.9; }
+    .btn-primary.loading { opacity: 0.7; cursor: not-allowed; }
+
+    /* ===== Secondary/Outline Button ===== */
+    .btn-outline {
+      width: 100%; height: 48px;
+      border: 1px solid #3A4142; border-radius: 8px;
+      background: transparent; color: #fff;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-outline:active { background: rgba(255,255,255,0.05); }
+
+    /* ===== Danger Button ===== */
+    .btn-danger {
+      height: 48px; border: none; border-radius: 8px;
+      background: rgba(255, 71, 87, 0.1);
+      color: #FF4757; font-size: 14px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%;
+    }
+
+    /* ===== Spinner ===== */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    .spinner-white {
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: #fff;
+    }
+
+    /* ===== Dialog Overlay ===== */
+    .dialog-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 16px;
+    }
+    .dialog-box {
+      background: #2A2D2D; border-radius: 12px;
+      padding: 24px; max-width: 320px; width: 100%;
+    }
+
+    /* ===== Avatar ===== */
+    .avatar-container {
+      position: relative; width: 80px; height: 80px; margin: 0 auto;
+    }
+    .avatar-img {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: #323738; border: 3px solid #24EE89;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .avatar-edit {
+      position: absolute; bottom: 0; right: 0;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #24EE89; border: 2px solid #232626;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+
+    /* ===== Info Row ===== */
+    .info-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(58, 65, 66, 0.5);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label { font-size: 14px; color: #B0B3B3; }
+    .info-row .value { font-size: 14px; color: #FFFFFF; font-weight: 500; }
+
+    /* ===== Section Card ===== */
+    .section-card {
+      background: #2A2D2D; border-radius: 12px; padding: 16px;
+    }
+    .section-title {
+      font-size: 14px; font-weight: 600; color: #B0B3B3;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    /* ===== Nav Row (clickable) ===== */
+    .nav-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px;
+      background: #2A2D2D; border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .nav-row:active { background: #323738; }
+
+    /* ===== SideDrawer Mock ===== */
+    .drawer-mock {
+      width: 300px; min-height: 100vh;
+      background: #1A1D1D;
+    }
+    .drawer-user-area {
+      padding: 16px; border-bottom: 1px solid #3A4142;
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer;
+    }
+    .drawer-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: #323738; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ===== Toast ===== */
+    .toast {
+      position: fixed; top: 72px; left: 50%; transform: translateX(-50%);
+      padding: 12px 20px; border-radius: 8px;
+      font-size: 14px; font-weight: 500; z-index: 200;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .toast-success { background: rgba(36, 238, 137, 0.15); color: #24EE89; border: 1px solid rgba(36, 238, 137, 0.3); }
+    .toast-error { background: rgba(255, 71, 87, 0.15); color: #FF4757; border: 1px solid rgba(255, 71, 87, 0.3); }
+
+    /* ===== Crop Modal ===== */
+    .crop-area {
+      width: 100%; aspect-ratio: 1; background: #1A1D1D;
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .crop-circle {
+      width: 200px; height: 200px; border-radius: 50%;
+      border: 2px solid #24EE89; position: absolute;
+      box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== Preview Tab Switcher ===== -->
+<div class="preview-tabs">
+  <button class="preview-tab active" onclick="showPage('profile')">Profile</button>
+  <button class="preview-tab" onclick="showPage('profile-edit')">Profile (Edit)</button>
+  <button class="preview-tab" onclick="showPage('security')">Security</button>
+  <button class="preview-tab" onclick="showPage('security-error')">Security (Error)</button>
+  <button class="preview-tab" onclick="showPage('security-loading')">Security (Loading)</button>
+  <button class="preview-tab" onclick="showPage('drawer-logged')">Drawer (Logged)</button>
+  <button class="preview-tab" onclick="showPage('logout-dialog')">Logout Dialog</button>
+  <button class="preview-tab" onclick="showPage('crop-modal')">Avatar Crop</button>
+  <button class="preview-tab" onclick="showPage('unbind-dialog')">Unbind Dialog</button>
+  <button class="preview-tab" onclick="showPage('toast-states')">Toasts</button>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 1: Profile Page (Normal)              -->
+<!-- ========================================== -->
+<div id="page-profile" class="page-section active">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="back-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </div>
+      <span class="title">Profile</span>
+    </div>
+
+    <!-- Avatar Section -->
+    <div class="py-8 px-4 flex flex-col items-center">
+      <div class="avatar-container">
+        <div class="avatar-img">
+          <!-- Default avatar placeholder: user icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6B7070" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="avatar-edit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+      </div>
+      <p class="text-txt text-base font-semibold mt-3">Player_8a3f</p>
+      <p class="text-txt-muted text-xs mt-1">Member since Mar 2026</p>
+    </div>
+
+    <!-- Nickname Section -->
+    <div class="px-4 mb-3">
+      <div class="section-card">
+        <div class="section-title">Nickname</div>
+        <div class="flex items-center justify-between py-2">
+          <span class="text-txt text-sm font-medium">Player_8a3f</span>
+          <div class="flex items-center gap-1 cursor-pointer text-brand text-sm font-semibold">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Info Section -->
+    <div class="px-4 mb-3">
+      <div class="section-card">
+        <div class="section-title">Account Info</div>
+        <div class="info-row">
+          <span class="label">Phone</span>
+          <span class="value">+91****7890</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Registered</span>
+          <span class="value">2026-03-04</span>
+        </div>
+        <div class="info-row">
+          <span class="label">VIP Level</span>
+          <div class="flex items-center gap-1.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span class="value">VIP 0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Settings Nav -->
+    <div class="px-4 mb-3">
+      <div class="nav-row">
+        <div class="flex items-center gap-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B0B3B3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span class="text-txt text-sm font-medium">Security Settings</span>
+        </div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+
+    <!-- Logout Button -->
+    <div class="px-4 mt-6 pb-8">
+      <button class="btn-danger">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 2: Profile Page (Edit Nickname)       -->
+<!-- ========================================== -->
+<div id="page-profile-edit" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <div class="page-header">
+      <div class="back-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </div>
+      <span class="title">Profile</span>
+    </div>
+
+    <!-- Avatar Section (with custom avatar) -->
+    <div class="py-8 px-4 flex flex-col items-center">
+      <div class="avatar-container">
+        <div class="avatar-img" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <!-- Simulate uploaded avatar with gradient -->
+          <span class="text-white text-2xl font-bold">P</span>
+        </div>
+        <div class="avatar-edit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+      </div>
+      <p class="text-txt text-base font-semibold mt-3">ProGamer99</p>
+      <p class="text-txt-muted text-xs mt-1">Member since Mar 2026</p>
+    </div>
+
+    <!-- Nickname Section (Edit Mode) -->
+    <div class="px-4 mb-3">
+      <div class="section-card">
+        <div class="section-title">Nickname</div>
+        <div class="mt-2">
+          <div class="form-input" style="border-color: #24EE89;">
+            <input type="text" value="ProGamer99" style="color: #fff;" />
+          </div>
+          <div class="flex gap-2 mt-3">
+            <button class="flex-1 h-10 rounded-lg bg-transparent border border-divider text-txt text-sm font-semibold cursor-pointer">Cancel</button>
+            <button class="flex-1 h-10 rounded-lg text-sm font-bold cursor-pointer border-none" style="background: linear-gradient(90deg, #24EE89, #9FE871); color: #000;">Save</button>
+          </div>
+          <p class="text-txt-muted text-xs mt-2">2-20 characters, letters, numbers and underscores only</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Info Section -->
+    <div class="px-4 mb-3">
+      <div class="section-card">
+        <div class="section-title">Account Info</div>
+        <div class="info-row">
+          <span class="label">Phone</span>
+          <span class="value">+91****7890</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Registered</span>
+          <span class="value">2026-03-04</span>
+        </div>
+        <div class="info-row">
+          <span class="label">VIP Level</span>
+          <div class="flex items-center gap-1.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span class="value">VIP 0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Settings Nav -->
+    <div class="px-4 mb-3">
+      <div class="nav-row">
+        <div class="flex items-center gap-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B0B3B3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span class="text-txt text-sm font-medium">Security Settings</span>
+        </div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+
+    <div class="px-4 mt-6 pb-8">
+      <button class="btn-danger">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 3: Security Settings (Normal)         -->
+<!-- ========================================== -->
+<div id="page-security" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <div class="page-header">
+      <div class="back-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </div>
+      <span class="title">Security Settings</span>
+    </div>
+
+    <div class="px-4 pt-4">
+      <!-- Change Password Section -->
+      <div class="section-card mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B0B3B3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span class="text-txt text-sm font-semibold">Change Password</span>
+        </div>
+
+        <!-- Current Password -->
+        <div class="mb-3">
+          <label class="text-txt-secondary text-xs block mb-1.5">Current Password</label>
+          <div class="form-input">
+            <input type="password" placeholder="Enter current password" />
+            <div class="icon-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- New Password -->
+        <div class="mb-3">
+          <label class="text-txt-secondary text-xs block mb-1.5">New Password</label>
+          <div class="form-input">
+            <input type="password" placeholder="6-16 characters, letters & numbers" />
+            <div class="icon-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="mb-4">
+          <label class="text-txt-secondary text-xs block mb-1.5">Confirm New Password</label>
+          <div class="form-input">
+            <input type="password" placeholder="Re-enter new password" />
+            <div class="icon-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-primary">Update Password</button>
+      </div>
+
+      <!-- Google Account Section (Unbound) -->
+      <div class="section-card mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 001 12c0 1.61.39 3.14 1.07 4.5l3.77-2.41z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          <span class="text-txt text-sm font-semibold">Google Account</span>
+        </div>
+
+        <div class="flex items-center justify-between py-2">
+          <div>
+            <p class="text-txt-secondary text-xs">Status</p>
+            <p class="text-txt-muted text-sm mt-0.5">Not linked</p>
+          </div>
+          <button class="h-10 px-5 rounded-lg text-sm font-bold cursor-pointer border-none flex items-center gap-2" style="background: linear-gradient(90deg, #24EE89, #9FE871); color: #000;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+            Bind
+          </button>
+        </div>
+      </div>
+
+      <!-- Google Account Section (Bound) -->
+      <!-- HTML comment: This section shown when user has bound Google account -->
+      <div class="section-card mb-4" style="display: none;">
+        <div class="flex items-center gap-2 mb-4">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 001 12c0 1.61.39 3.14 1.07 4.5l3.77-2.41z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          <span class="text-txt text-sm font-semibold">Google Account</span>
+        </div>
+        <div class="flex items-center justify-between py-2">
+          <div>
+            <p class="text-txt-secondary text-xs">Linked to</p>
+            <p class="text-txt text-sm mt-0.5">user@gmail.com</p>
+          </div>
+          <button class="h-10 px-5 rounded-lg text-sm font-semibold cursor-pointer border border-divider bg-transparent text-error flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.84 12.25l1.72-1.71a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M5.16 11.75l-1.72 1.71a5 5 0 007.07 7.07l1.72-1.71"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+            Unbind
+          </button>
+        </div>
+      </div>
+
+      <div class="pb-8"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 4: Security Settings (Error State)    -->
+<!-- ========================================== -->
+<div id="page-security-error" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <div class="page-header">
+      <div class="back-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </div>
+      <span class="title">Security Settings</span>
+    </div>
+
+    <div class="px-4 pt-4">
+      <div class="section-card mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B0B3B3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span class="text-txt text-sm font-semibold">Change Password</span>
+        </div>
+
+        <!-- Current Password (Error) -->
+        <div class="mb-3">
+          <label class="text-txt-secondary text-xs block mb-1.5">Current Password</label>
+          <div class="form-input error">
+            <input type="password" value="wrongpass" style="color: #fff;" />
+            <div class="icon-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+          </div>
+          <p class="error-text">Current password is incorrect</p>
+        </div>
+
+        <!-- New Password (Error) -->
+        <div class="mb-3">
+          <label class="text-txt-secondary text-xs block mb-1.5">New Password</label>
+          <div class="form-input error">
+            <input type="text" value="123" style="color: #fff;" />
+            <div class="icon-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+          </div>
+          <p class="error-text">Password must be 6-16 characters with letters and numbers</p>
+        </div>
+
+        <!-- Confirm Password (Error) -->
+        <div class="mb-4">
+          <label class="text-txt-secondary text-xs block mb-1.5">Confirm New Password</label>
+          <div class="form-input error">
+            <input type="text" value="1234" style="color: #fff;" />
+            <div class="icon-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+          </div>
+          <p class="error-text">Passwords do not match</p>
+        </div>
+
+        <button class="btn-primary" style="opacity: 0.5; cursor: not-allowed;">Update Password</button>
+      </div>
+
+      <!-- Google Account (Bound State) -->
+      <div class="section-card mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 001 12c0 1.61.39 3.14 1.07 4.5l3.77-2.41z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          <span class="text-txt text-sm font-semibold">Google Account</span>
+        </div>
+        <div class="flex items-center justify-between py-2">
+          <div>
+            <p class="text-txt-secondary text-xs">Linked to</p>
+            <p class="text-txt text-sm mt-0.5">user@gmail.com</p>
+          </div>
+          <button class="h-10 px-5 rounded-lg text-sm font-semibold cursor-pointer border border-divider bg-transparent text-error flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.84 12.25l1.72-1.71a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M5.16 11.75l-1.72 1.71a5 5 0 007.07 7.07l1.72-1.71"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+            Unbind
+          </button>
+        </div>
+      </div>
+
+      <div class="pb-8"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 5: Security Settings (Loading State)  -->
+<!-- ========================================== -->
+<div id="page-security-loading" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg">
+
+    <div class="page-header">
+      <div class="back-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </div>
+      <span class="title">Security Settings</span>
+    </div>
+
+    <div class="px-4 pt-4">
+      <div class="section-card mb-4" style="opacity: 0.6;">
+        <div class="flex items-center gap-2 mb-4">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B0B3B3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span class="text-txt text-sm font-semibold">Change Password</span>
+        </div>
+
+        <div class="mb-3">
+          <label class="text-txt-secondary text-xs block mb-1.5">Current Password</label>
+          <div class="form-input" style="opacity:0.6;">
+            <input type="password" value="currentpass" disabled style="color: #fff;" />
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="text-txt-secondary text-xs block mb-1.5">New Password</label>
+          <div class="form-input" style="opacity:0.6;">
+            <input type="password" value="newpass123" disabled style="color: #fff;" />
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="text-txt-secondary text-xs block mb-1.5">Confirm New Password</label>
+          <div class="form-input" style="opacity:0.6;">
+            <input type="password" value="newpass123" disabled style="color: #fff;" />
+          </div>
+        </div>
+
+        <button class="btn-primary loading">
+          <div class="spinner"></div>
+        </button>
+      </div>
+
+      <!-- Google (loading bind) -->
+      <div class="section-card mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.04 10.04 0 001 12c0 1.61.39 3.14 1.07 4.5l3.77-2.41z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          <span class="text-txt text-sm font-semibold">Google Account</span>
+        </div>
+        <div class="flex items-center justify-between py-2">
+          <div>
+            <p class="text-txt-secondary text-xs">Status</p>
+            <p class="text-txt-muted text-sm mt-0.5">Linking...</p>
+          </div>
+          <button class="h-10 px-5 rounded-lg text-sm font-bold cursor-not-allowed border-none flex items-center gap-2" style="background: linear-gradient(90deg, #24EE89, #9FE871); color: #000; opacity: 0.5;">
+            <div class="spinner" style="width:16px; height:16px; border-width:2px;"></div>
+          </button>
+        </div>
+      </div>
+
+      <div class="pb-8"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 6: SideDrawer (Logged In)             -->
+<!-- ========================================== -->
+<div id="page-drawer-logged" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg flex">
+
+    <!-- Drawer -->
+    <div class="drawer-mock">
+
+      <!-- User Info Area (replaces Promo Banner when logged in) -->
+      <div class="drawer-user-area">
+        <div class="drawer-avatar">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B7070" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-txt text-base font-semibold truncate">Player_8a3f</p>
+          <p class="text-txt-muted text-xs mt-0.5">+91****7890</p>
+          <div class="flex items-center gap-1 text-brand text-xs mt-1 font-medium">
+            Profile
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu Items (simplified mock) -->
+      <div class="px-3 py-3">
+        <div class="text-txt-muted text-2xs uppercase tracking-wider px-3 py-2 font-semibold">Games</div>
+        <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-txt text-sm cursor-pointer hover:bg-bg-hover">
+          <span style="color:#FFD700;">&#9733;</span> Favourite
+        </div>
+        <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-txt text-sm cursor-pointer hover:bg-bg-hover">
+          <span style="color:#FF6B6B;">&#9679;</span> Crash
+        </div>
+        <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-txt text-sm cursor-pointer hover:bg-bg-hover">
+          <span style="color:#FF4757;">&#9679;</span> Live
+        </div>
+        <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-txt text-sm cursor-pointer hover:bg-bg-hover">
+          <span style="color:#24EE89;">&#9679;</span> Slots
+        </div>
+
+        <div class="border-t border-divider my-3 mx-3" style="border-color: rgba(58,65,66,0.5);"></div>
+
+        <div class="text-txt-muted text-2xs uppercase tracking-wider px-3 py-2 font-semibold">Features</div>
+        <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-txt text-sm cursor-pointer hover:bg-bg-hover">
+          <span>&#128276;</span> Notifications
+        </div>
+        <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-txt text-sm cursor-pointer hover:bg-bg-hover">
+          <span>&#127381;</span> VIP Club
+        </div>
+
+        <div class="border-t border-divider my-3 mx-3" style="border-color: rgba(58,65,66,0.5);"></div>
+
+        <!-- Logout Button at bottom of drawer -->
+        <div class="px-3 py-2">
+          <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-error text-sm font-semibold cursor-pointer bg-transparent border-none text-left">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backdrop (right side) -->
+    <div class="flex-1 bg-black/60"></div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 7: Logout Confirmation Dialog         -->
+<!-- ========================================== -->
+<div id="page-logout-dialog" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg relative">
+
+    <!-- Background page (dimmed) -->
+    <div style="opacity: 0.3; pointer-events: none;">
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </div>
+        <span class="title">Profile</span>
+      </div>
+      <div class="py-8 px-4 flex flex-col items-center">
+        <div class="avatar-container">
+          <div class="avatar-img">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6B7070" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+        </div>
+        <p class="text-txt text-base font-semibold mt-3">Player_8a3f</p>
+      </div>
+    </div>
+
+    <!-- Dialog Overlay -->
+    <div class="dialog-overlay" style="position: absolute;">
+      <div class="dialog-box">
+        <div class="flex items-center gap-3 mb-3">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF4757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <h3 class="text-txt text-lg font-semibold">Logout</h3>
+        </div>
+        <p class="text-txt-secondary text-sm mb-6">Are you sure you want to logout? You will need to sign in again to access your account.</p>
+        <div class="flex gap-3">
+          <button class="flex-1 h-12 rounded-lg bg-transparent border border-divider text-txt text-sm font-semibold cursor-pointer">Cancel</button>
+          <button class="flex-1 h-12 rounded-lg border-none text-sm font-semibold cursor-pointer" style="background: #FF4757; color: #fff;">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 8: Avatar Crop Modal                  -->
+<!-- ========================================== -->
+<div id="page-crop-modal" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg relative">
+
+    <!-- Background (dimmed) -->
+    <div style="opacity: 0.3; pointer-events: none;">
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </div>
+        <span class="title">Profile</span>
+      </div>
+    </div>
+
+    <!-- Crop Modal Overlay -->
+    <div class="dialog-overlay" style="position: absolute;">
+      <div class="dialog-box" style="max-width: 360px; padding: 20px;">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-txt text-base font-semibold">Crop Avatar</h3>
+          <div class="cursor-pointer" style="color: #6B7070;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+        </div>
+
+        <!-- Crop Area -->
+        <div class="crop-area mb-4">
+          <!-- Simulated image background -->
+          <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+            <span class="text-white/30 text-6xl font-bold">P</span>
+          </div>
+          <div class="crop-circle"></div>
+        </div>
+
+        <!-- Zoom slider -->
+        <div class="flex items-center gap-3 mb-5">
+          <span class="text-txt-muted text-xs">-</span>
+          <div class="flex-1 h-1 bg-bg-hover rounded-full relative">
+            <div class="absolute left-0 top-0 h-1 w-1/2 bg-brand rounded-full"></div>
+            <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-brand" style="left: calc(50% - 8px); box-shadow: 0 0 4px rgba(36,238,137,0.5);"></div>
+          </div>
+          <span class="text-txt-muted text-xs">+</span>
+        </div>
+
+        <div class="flex gap-3">
+          <button class="flex-1 h-11 rounded-lg bg-transparent border border-divider text-txt text-sm font-semibold cursor-pointer">Cancel</button>
+          <button class="flex-1 h-11 rounded-lg text-sm font-bold cursor-pointer border-none" style="background: linear-gradient(90deg, #24EE89, #9FE871); color: #000;">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 9: Google Unbind Confirmation Dialog   -->
+<!-- ========================================== -->
+<div id="page-unbind-dialog" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg relative">
+
+    <!-- Background (dimmed) -->
+    <div style="opacity: 0.3; pointer-events: none;">
+      <div class="page-header">
+        <div class="back-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </div>
+        <span class="title">Security Settings</span>
+      </div>
+    </div>
+
+    <!-- Unbind Confirmation -->
+    <div class="dialog-overlay" style="position: absolute;">
+      <div class="dialog-box">
+        <div class="flex items-center gap-3 mb-3">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFA502" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <h3 class="text-txt text-lg font-semibold">Unbind Google</h3>
+        </div>
+        <p class="text-txt-secondary text-sm mb-2">Are you sure you want to unbind your Google account?</p>
+        <p class="text-txt-muted text-xs mb-6">After unbinding, you will no longer be able to sign in with Google. Make sure you remember your password.</p>
+        <div class="flex gap-3">
+          <button class="flex-1 h-12 rounded-lg bg-transparent border border-divider text-txt text-sm font-semibold cursor-pointer">Cancel</button>
+          <button class="flex-1 h-12 rounded-lg border-none text-sm font-semibold cursor-pointer" style="background: #FF4757; color: #fff;">Unbind</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 10: Toast Notification States         -->
+<!-- ========================================== -->
+<div id="page-toast-states" class="page-section">
+  <div class="max-w-mobile mx-auto min-h-screen bg-bg px-4 py-8">
+
+    <h2 class="text-txt text-lg font-semibold mb-6">Toast Notification States</h2>
+
+    <!-- Success Toasts -->
+    <div class="mb-8">
+      <p class="text-txt-secondary text-xs uppercase tracking-wider mb-3 font-semibold">Success</p>
+      <div class="space-y-3">
+        <div class="toast-success" style="position: relative; transform: none; left: auto;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Password updated successfully
+        </div>
+        <div class="toast-success" style="position: relative; transform: none; left: auto;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Nickname saved
+        </div>
+        <div class="toast-success" style="position: relative; transform: none; left: auto;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Avatar updated
+        </div>
+        <div class="toast-success" style="position: relative; transform: none; left: auto;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Google account linked
+        </div>
+        <div class="toast-success" style="position: relative; transform: none; left: auto;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Google account unlinked
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Toasts -->
+    <div class="mb-8">
+      <p class="text-txt-secondary text-xs uppercase tracking-wider mb-3 font-semibold">Error</p>
+      <div class="space-y-3">
+        <div class="toast-error" style="position: relative; transform: none; left: auto;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Failed to update password
+        </div>
+        <div class="toast-error" style="position: relative; transform: none; left: auto;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Please set a password before unbinding Google
+        </div>
+        <div class="toast-error" style="position: relative; transform: none; left: auto;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Image must be under 5MB
+        </div>
+        <div class="toast-error" style="position: relative; transform: none; left: auto;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Network error, please try again
+        </div>
+      </div>
+    </div>
+
+    <!-- Password Update Success Message -->
+    <div class="mb-8">
+      <p class="text-txt-secondary text-xs uppercase tracking-wider mb-3 font-semibold">Inline Info</p>
+      <div class="section-card">
+        <div class="flex items-start gap-3 p-1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#24EE89" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div>
+            <p class="text-brand text-sm font-semibold">Password updated</p>
+            <p class="text-txt-muted text-xs mt-1">Other devices have been logged out. Please use your new password to sign in.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== Tab Switching Script ===== -->
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>
