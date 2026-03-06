@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
 	"go-plus/server/internal/middleware"
 	"go-plus/server/internal/service"
@@ -16,7 +17,9 @@ func SetupRouter(
 	walletHandler *WalletHandler,
 	supportHandler *SupportHandler,
 	adminHandler *AdminHandler,
+	userMgmtHandler *UserMgmtHandler,
 	jwtService *service.JWTService,
+	db *gorm.DB,
 ) *gin.Engine {
 	if mode == "release" {
 		gin.SetMode(gin.ReleaseMode)
@@ -80,11 +83,22 @@ func SetupRouter(
 
 			// 需要认证的端点
 			authRequired := auth.Group("")
-			authRequired.Use(middleware.AuthMiddleware(jwtService))
+			authRequired.Use(middleware.AuthMiddleware(jwtService, db))
 			{
 				authRequired.GET("/me", authHandler.Me)
 				authRequired.POST("/logout", authHandler.Logout)
 			}
+		}
+
+		// 用户管理端点 (全部需要认证)
+		user := v1.Group("/user")
+		user.Use(middleware.AuthMiddleware(jwtService, db))
+		{
+			user.PUT("/profile", userMgmtHandler.UpdateProfile)
+			user.POST("/avatar", userMgmtHandler.UploadAvatar)
+			user.PUT("/password", userMgmtHandler.ChangePassword)
+			user.POST("/google/bind", userMgmtHandler.BindGoogle)
+			user.POST("/google/unbind", userMgmtHandler.UnbindGoogle)
 		}
 
 		// 客服端点 (公开)
@@ -96,7 +110,7 @@ func SetupRouter(
 
 		// 钱包端点 (全部需要认证)
 		wallet := v1.Group("/wallet")
-		wallet.Use(middleware.AuthMiddleware(jwtService))
+		wallet.Use(middleware.AuthMiddleware(jwtService, db))
 		{
 			wallet.GET("", walletHandler.GetBalance)
 			wallet.GET("/payment-methods", walletHandler.GetPaymentMethods)

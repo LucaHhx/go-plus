@@ -15,9 +15,10 @@ var (
 
 // JWTClaims JWT 负载
 type JWTClaims struct {
-	UserID     uint   `json:"user_id"`
-	Role       string `json:"role"`
-	MarketCode string `json:"market_code"`
+	UserID          uint   `json:"user_id"`
+	Role            string `json:"role"`
+	MarketCode      string `json:"market_code"`
+	PasswordVersion int    `json:"pwd_ver"`
 	jwt.RegisteredClaims
 }
 
@@ -35,12 +36,13 @@ func NewJWTService(cfg *config.JWTConfig) *JWTService {
 }
 
 // GenerateToken 签发 JWT Token
-func (s *JWTService) GenerateToken(userID uint, role string, marketCode string) (string, error) {
+func (s *JWTService) GenerateToken(userID uint, role string, marketCode string, pwdVer int) (string, error) {
 	now := time.Now()
 	claims := JWTClaims{
-		UserID:     userID,
-		Role:       role,
-		MarketCode: marketCode,
+		UserID:          userID,
+		Role:            role,
+		MarketCode:      marketCode,
+		PasswordVersion: pwdVer,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(s.expireHours) * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(now),

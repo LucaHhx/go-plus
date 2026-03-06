@@ -11,6 +11,7 @@ interface AuthState {
   login: (token: string, user: User) => void;
   logout: () => void;
   updateUser: (user: Partial<User>) => void;
+  updateToken: (token: string) => void;
   fetchMe: () => Promise<void>;
   initialize: () => Promise<void>;
 }
@@ -39,6 +40,11 @@ export const useAuthStore = create<AuthState>((set, _get) => ({
     set((state) => ({
       user: state.user ? { ...state.user, ...partial } : null,
     }));
+  },
+
+  updateToken: (token: string) => {
+    localStorage.setItem('auth_token', token);
+    set({ token });
   },
 
   fetchMe: async () => {

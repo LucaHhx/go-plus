@@ -96,7 +96,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	}
 
 	// 签发 JWT
-	token, err := h.jwtService.GenerateToken(user.ID, user.Role, user.MarketCode)
+	token, err := h.jwtService.GenerateToken(user.ID, user.Role, user.MarketCode, user.PasswordVersion)
 	if err != nil {
 		h.logger.Error("Failed to generate token", zap.Error(err))
 		response.Error(c, response.CodeValidationError, "Failed to generate token")
@@ -143,7 +143,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.jwtService.GenerateToken(user.ID, user.Role, user.MarketCode)
+	token, err := h.jwtService.GenerateToken(user.ID, user.Role, user.MarketCode, user.PasswordVersion)
 	if err != nil {
 		h.logger.Error("Failed to generate token", zap.Error(err))
 		response.Error(c, response.CodeValidationError, "Failed to generate token")
@@ -190,7 +190,7 @@ func (h *AuthHandler) LoginOTP(c *gin.Context) {
 		return
 	}
 
-	token, err := h.jwtService.GenerateToken(user.ID, user.Role, user.MarketCode)
+	token, err := h.jwtService.GenerateToken(user.ID, user.Role, user.MarketCode, user.PasswordVersion)
 	if err != nil {
 		h.logger.Error("Failed to generate token", zap.Error(err))
 		response.Error(c, response.CodeValidationError, "Failed to generate token")
@@ -222,7 +222,7 @@ func (h *AuthHandler) GoogleLogin(c *gin.Context) {
 		return
 	}
 
-	token, err := h.jwtService.GenerateToken(user.ID, user.Role, user.MarketCode)
+	token, err := h.jwtService.GenerateToken(user.ID, user.Role, user.MarketCode, user.PasswordVersion)
 	if err != nil {
 		h.logger.Error("Failed to generate token", zap.Error(err))
 		response.Error(c, response.CodeValidationError, "Failed to generate token")

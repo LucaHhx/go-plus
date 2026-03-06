@@ -8,7 +8,14 @@ export interface User {
   market_code: string;
   balance: number;
   bonus_balance: number;
+  has_password: boolean;
   created_at: string;
+}
+
+export interface ChangePasswordRequest {
+  current_password?: string;
+  new_password: string;
+  confirm_password: string;
 }
 
 export interface RegisterRequest {

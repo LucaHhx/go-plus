@@ -23,4 +23,7 @@ export const authApi = {
 
   getMe: () =>
     get<User>('/auth/me'),
+
+  logout: () =>
+    post<null>('/auth/logout', {}),
 };

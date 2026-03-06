@@ -4,7 +4,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
+	"go-plus/server/internal/model"
 	"go-plus/server/internal/response"
 	"go-plus/server/internal/service"
 )
@@ -37,8 +39,8 @@ func OptionalAuthMiddleware(jwtService *service.JWTService) gin.HandlerFunc {
 	}
 }
 
-// AuthMiddleware JWT 认证中间件
-func AuthMiddleware(jwtService *service.JWTService) gin.HandlerFunc {
+// AuthMiddleware JWT 认证中间件 (含 password_version 校验)
+func AuthMiddleware(jwtService *service.JWTService, db ...*gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -60,6 +62,18 @@ func AuthMiddleware(jwtService *service.JWTService) gin.HandlerFunc {
 			response.Error(c, response.CodeTokenInvalid, "Token is invalid or expired")
 			c.Abort()
 			return
+		}
+
+		// pwd_ver 校验: 当有 db 可用且 token 中 pwd_ver > 0 或用户已修改过密码时校验
+		if len(db) > 0 && db[0] != nil {
+			var user model.User
+			if err := db[0].Select("password_version").Where("id = ?", claims.UserID).First(&user).Error; err == nil {
+				if user.PasswordVersion > 0 && claims.PasswordVersion != user.PasswordVersion {
+					response.Error(c, response.CodeTokenInvalid, "Token is invalid, password has been changed")
+					c.Abort()
+					return
+				}
+			}
 		}
 
 		// 将用户信息存入 context

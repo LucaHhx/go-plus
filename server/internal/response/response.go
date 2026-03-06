@@ -16,6 +16,14 @@ const (
 	CodeUserDisabled       = 1005
 	CodeTokenInvalid       = 1006
 	CodeGoogleAuthFailed   = 1007
+	CodeFileTooLarge       = 1008
+	CodeImageProcessFailed = 1009
+	CodePasswordMismatch   = 1010
+	CodePasswordWeak       = 1011
+	CodeGoogleAlreadyBound = 1012
+	CodeAlreadyBoundGoogle = 1013
+	CodeGoogleNotBound     = 1014
+	CodeGoogleOnlyLogin    = 1015
 
 	// 管理后台错误码
 	CodeAdminInvalidCredentials = 4001
@@ -47,6 +55,14 @@ var codeHTTPStatus = map[int]int{
 	CodeUserDisabled:       http.StatusForbidden,
 	CodeTokenInvalid:       http.StatusUnauthorized,
 	CodeGoogleAuthFailed:   http.StatusUnauthorized,
+	CodeFileTooLarge:       http.StatusBadRequest,
+	CodeImageProcessFailed: http.StatusInternalServerError,
+	CodePasswordMismatch:   http.StatusBadRequest,
+	CodePasswordWeak:       http.StatusBadRequest,
+	CodeGoogleAlreadyBound: http.StatusConflict,
+	CodeAlreadyBoundGoogle: http.StatusConflict,
+	CodeGoogleNotBound:     http.StatusBadRequest,
+	CodeGoogleOnlyLogin:    http.StatusBadRequest,
 
 	CodeAdminInvalidCredentials: http.StatusUnauthorized,
 	CodeAdminTokenInvalid:       http.StatusUnauthorized,

@@ -12,6 +12,8 @@ import GamePlayPage from '@/pages/game/GamePlayPage';
 import DepositPage from '@/pages/wallet/DepositPage';
 import WithdrawPage from '@/pages/wallet/WithdrawPage';
 import TransactionsPage from '@/pages/wallet/TransactionsPage';
+import ProfilePage from '@/pages/profile/ProfilePage';
+import SecurityPage from '@/pages/profile/SecurityPage';
 
 export default function App() {
   const initialize = useAuthStore((s) => s.initialize);
@@ -71,6 +73,24 @@ export default function App() {
           element={
             <AuthGuard requireAuth={true}>
               <TransactionsPage />
+            </AuthGuard>
+          }
+        />
+
+        {/* Profile pages -- full screen, require auth */}
+        <Route
+          path="/profile"
+          element={
+            <AuthGuard requireAuth={true}>
+              <ProfilePage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/profile/security"
+          element={
+            <AuthGuard requireAuth={true}>
+              <SecurityPage />
             </AuthGuard>
           }
         />

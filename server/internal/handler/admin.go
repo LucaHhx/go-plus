@@ -54,7 +54,7 @@ func (h *AdminHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.jwtService.GenerateToken(admin.ID, admin.Role, "")
+	token, err := h.jwtService.GenerateToken(admin.ID, admin.Role, "", 0)
 	if err != nil {
 		h.logger.Error("Failed to generate admin token", zap.Error(err))
 		response.Error(c, response.CodeAdminTokenInvalid, "Failed to generate token")

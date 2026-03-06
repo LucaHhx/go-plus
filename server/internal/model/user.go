@@ -7,20 +7,21 @@ import (
 )
 
 type User struct {
-	ID           uint           `gorm:"primaryKey;autoIncrement" json:"id"`
-	Phone        string         `gorm:"type:varchar(20);uniqueIndex;not null" json:"phone"`
-	PasswordHash string         `gorm:"type:varchar(255);not null" json:"-"`
-	Nickname     string         `gorm:"type:varchar(50);default:''" json:"nickname"`
-	AvatarURL    string         `gorm:"type:varchar(500);default:''" json:"avatar_url"`
-	GoogleID     *string        `gorm:"type:varchar(100);uniqueIndex" json:"-"`
-	GoogleEmail  string         `gorm:"type:varchar(255);default:''" json:"google_email,omitempty"`
-	Role         string         `gorm:"type:varchar(20);default:'user'" json:"role"`
-	Status       string         `gorm:"type:varchar(20);default:'active'" json:"status,omitempty"`
-	MarketCode   string         `gorm:"type:varchar(10);default:'IN'" json:"market_code"`
-	LastLoginAt  *time.Time     `json:"last_login_at,omitempty"`
-	CreatedAt    time.Time      `json:"created_at"`
-	UpdatedAt    time.Time      `json:"-"`
-	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	ID              uint           `gorm:"primaryKey;autoIncrement" json:"id"`
+	Phone           string         `gorm:"type:varchar(20);uniqueIndex;not null" json:"phone"`
+	PasswordHash    string         `gorm:"type:varchar(255);not null" json:"-"`
+	Nickname        string         `gorm:"type:varchar(50);default:''" json:"nickname"`
+	AvatarURL       string         `gorm:"type:varchar(500);default:''" json:"avatar_url"`
+	GoogleID        *string        `gorm:"type:varchar(100);uniqueIndex" json:"-"`
+	GoogleEmail     string         `gorm:"type:varchar(255);default:''" json:"google_email,omitempty"`
+	Role            string         `gorm:"type:varchar(20);default:'user'" json:"role"`
+	Status          string         `gorm:"type:varchar(20);default:'active'" json:"status,omitempty"`
+	MarketCode      string         `gorm:"type:varchar(10);default:'IN'" json:"market_code"`
+	PasswordVersion int            `gorm:"default:0" json:"-"`
+	LastLoginAt     *time.Time     `json:"last_login_at,omitempty"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"-"`
+	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (User) TableName() string {
@@ -45,6 +46,7 @@ type UserMeResponse struct {
 	Nickname     string    `json:"nickname"`
 	AvatarURL    string    `json:"avatar_url"`
 	GoogleEmail  string    `json:"google_email"`
+	HasPassword  bool      `json:"has_password"`
 	Role         string    `json:"role"`
 	MarketCode   string    `json:"market_code"`
 	Balance      float64   `json:"balance"`
