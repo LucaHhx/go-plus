@@ -6,6 +6,7 @@
 
 ### 变更
 
+- 2026-03-06 新增需求 #8 版本更新日志 (version-changelog): 后台Markdown编辑+前端版本日志展示; 参照1goplus.com侧边菜单底部版本更新功能; L1 tasks.md第二期/第三期编号顺延
 - 2026-03-04 PM内容流对齐(第六轮): 根据UI设计师确认的merge.html实际顺序,修正2-homepage plan.md+tasks.md首页内容流; 新增1GO Selection区(Sub-Tab+mock); 修正支付方式位于37%返现之前; 游戏分类拆为Fishing前4个+1GO Selection+Crash后2个; 同步更新project.md信息架构和tasks.md mock明细
 - 2026-03-04 PM术语统一(第五轮): 全部L2 plan.md和project.md中"1goplus.com"/"原站"替换为"UI设计图纸(merge.html)"/"设计图纸"; project.md参考原型行标注"仅作为UI设计师参考源,开发以merge.html为准"
 - 2026-03-04 PM按新策略彻底重构(第四轮): 核心策略变更为"第一期=全部页面+全部组件+mock数据"; project.md分期规划重写; 全部6个需求plan.md去掉"二期/三期"标注,统一为"不属于本需求范围"归属说明; 视觉验收标题统一为"前端1:1还原merge.html设计稿"; 2-homepage范围和tasks简化mock标注
