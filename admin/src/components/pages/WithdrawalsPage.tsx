@@ -61,7 +61,7 @@ export default function WithdrawalsPage() {
   const columns: Column<Withdrawal>[] = [
     { key: 'id', title: 'ID' },
     { key: 'userId', title: 'User ID' },
-    { key: 'amount', title: 'Amount', render: w => <span style={{ fontWeight: 700 }}>₹{w.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span> },
+    { key: 'amount', title: 'Amount', render: w => <span style={{ fontWeight: 700 }}>Rp{w.amount.toLocaleString('id-ID', { minimumFractionDigits: 0 })}</span> },
     { key: 'paymentMethod', title: 'Method' },
     { key: 'status', title: 'Status', render: w => <StatusBadge status={w.status} /> },
     { key: 'createdAt', title: 'Time', render: w => <span style={{ color: '#64748b' }}>{w.createdAt}</span> },
@@ -99,7 +99,7 @@ export default function WithdrawalsPage() {
         <ConfirmModal
           visible
           title={`${confirm.action === 'approve' ? 'Approve' : 'Reject'} Withdrawal`}
-          message={`${confirm.action === 'approve' ? 'Approve' : 'Reject'} withdrawal ${confirm.withdrawal.id} for ₹${confirm.withdrawal.amount.toLocaleString('en-IN')}?`}
+          message={`${confirm.action === 'approve' ? 'Approve' : 'Reject'} withdrawal ${confirm.withdrawal.id} for Rp${confirm.withdrawal.amount.toLocaleString('id-ID')}?`}
           confirmText={confirm.action === 'approve' ? 'Approve' : 'Reject'}
           variant={confirm.action === 'approve' ? 'primary' : 'danger'}
           showRemark

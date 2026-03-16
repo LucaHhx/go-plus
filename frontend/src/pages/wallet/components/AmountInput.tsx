@@ -15,7 +15,7 @@ export default function AmountInput({ value, onChange, placeholder = '0' }: Amou
 
   return (
     <div className="flex items-center bg-bg-card border border-divider focus-within:border-brand rounded-lg h-14 px-4 transition-colors">
-      <span className="text-txt-secondary text-2xl font-bold mr-2">₹</span>
+      <span className="text-txt-secondary text-2xl font-bold mr-2">Rp</span>
       <input
         type="text"
         inputMode="decimal"

@@ -4,7 +4,7 @@ set -e
 # ============ 配置 ============
 SSH_KEY="/Users/luca/.ssh/key"
 SSH_USER="MINI1"
-SSH_HOST="192.168.0.228"
+SSH_HOST="192.168.0.142"
 SSH_PORT=22
 REMOTE_DIR="~/go-plus"
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"

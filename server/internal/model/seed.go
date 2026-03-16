@@ -9,7 +9,7 @@ import (
 )
 
 // seedVersion 用于标识 seed 数据版本，版本变化时重建数据
-const seedVersion = "9"
+const seedVersion = "10"
 
 // SeedData 初始化种子数据
 func SeedData(db *gorm.DB, logger *zap.Logger) {
@@ -49,6 +49,12 @@ func SeedData(db *gorm.DB, logger *zap.Logger) {
 	seedSocialLinks(db, logger)
 	seedLiveSupportConfig(db, logger)
 
+	// 迁移已有数据的货币从 INR 到 IDR
+	db.Model(&Wallet{}).Where("currency = ?", "INR").Updates(map[string]interface{}{"currency": "IDR", "market_code": "ID"})
+	db.Model(&Transaction{}).Where("market_code = ?", "IN").Update("market_code", "ID")
+	db.Model(&PaymentMethod{}).Where("market_code = ?", "IN").Update("market_code", "ID")
+	logger.Info("Migrated existing data currency from INR to IDR")
+
 	// 更新版本号
 	db.Where("config_key = ? AND market_code = ?", "seed_version", "SYSTEM").Delete(&SystemConfig{})
 	db.Create(&SystemConfig{ConfigKey: "seed_version", ConfigValue: seedVersion, Description: "Seed data version", MarketCode: "SYSTEM"})
@@ -56,13 +62,13 @@ func SeedData(db *gorm.DB, logger *zap.Logger) {
 
 func seedMarket(db *gorm.DB, logger *zap.Logger) {
 	market := Market{
-		Code:           "IN",
-		Name:           "India",
-		Currency:       "INR",
-		CurrencySymbol: "₹",
-		PhonePrefix:    "+91",
-		Locale:         "en",
-		Timezone:       "Asia/Kolkata",
+		Code:           "ID",
+		Name:           "Indonesia",
+		Currency:       "IDR",
+		CurrencySymbol: "Rp",
+		PhonePrefix:    "+62",
+		Locale:         "id",
+		Timezone:       "Asia/Jakarta",
 		Status:         "active",
 	}
 	db.Create(&market)

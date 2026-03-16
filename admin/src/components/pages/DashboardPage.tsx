@@ -38,8 +38,8 @@ const mockStats: DashboardStats = {
   ],
 };
 
-function formatINR(amount: number): string {
-  return '₹' + amount.toLocaleString('en-IN');
+function formatIDR(amount: number): string {
+  return 'Rp' + amount.toLocaleString('id-ID');
 }
 
 /** Map backend nested response to frontend flat structure.
@@ -108,7 +108,7 @@ export default function DashboardPage() {
         <StatCard
           icon="trendUp"
           label="Deposits Today"
-          value={formatINR(stats.depositsToday)}
+          value={formatIDR(stats.depositsToday)}
           change={`${stats.depositsChange > 0 ? '+' : ''}${stats.depositsChange}% from yesterday`}
           changeType={stats.depositsChange >= 0 ? 'up' : 'down'}
           iconColor="#24EE89"
@@ -120,7 +120,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="stat-card-label">Withdrawals Today</div>
-          <div className="stat-card-value">{formatINR(stats.withdrawalsToday)}</div>
+          <div className="stat-card-value">{formatIDR(stats.withdrawalsToday)}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span className={`stat-change ${stats.withdrawalsChange >= 0 ? 'up' : 'down'}`}>
               {stats.withdrawalsChange > 0 ? '+' : ''}{stats.withdrawalsChange}%

@@ -30,16 +30,16 @@ const menuItems: MenuItemData[] = [
   { key: 'gift-code', label: 'Gift Code', icon: '/assets/icons/menu/gift-code.svg', group: 'features', enabled: false },
   { key: 'vip-club', label: 'VIP Club', icon: '/assets/icons/menu/vip-club.svg', group: 'features', enabled: false },
   { key: 'affiliate', label: 'Affiliate', icon: '/assets/icons/menu/affiliate.svg', group: 'features', enabled: false },
-  { key: 'get-1700', label: 'GET \u20B91700', icon: '/assets/icons/menu/info-circle.svg', group: 'features', enabled: false },
+  { key: 'get-1700', label: 'GET Rp1700', icon: '/assets/icons/menu/info-circle.svg', group: 'features', enabled: false },
   { key: 'live-support', label: 'Live Support', icon: '/assets/icons/menu/live-support.svg', group: 'features', enabled: true },
 ];
 
-/** Format phone: +91****7890 */
+/** Format phone: +62****7890 */
 function maskPhone(phone: string) {
   if (!phone) return '';
-  const digits = phone.replace(/^\+91/, '');
+  const digits = phone.replace(/^\+62/, '');
   if (digits.length <= 4) return phone;
-  return `+91${'*'.repeat(digits.length - 4)}${digits.slice(-4)}`;
+  return `+62${'*'.repeat(digits.length - 4)}${digits.slice(-4)}`;
 }
 
 export default function SideDrawer() {

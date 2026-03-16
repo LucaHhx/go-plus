@@ -25,7 +25,7 @@ interface UserDetail {
 
 const mockDetail: UserDetail = {
   id: '1001',
-  phone: '+91 98765 43210',
+  phone: '+62 98765 43210',
   nickname: 'player1001',
   createdAt: '2026-03-04',
   lastLoginAt: '2026-03-04 14:30',
@@ -100,11 +100,11 @@ export default function UserDetailPage() {
           <div className="balance-cards">
             <div className="balance-item">
               <span className="balance-label">Main Balance</span>
-              <span className="balance-value">₹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              <span className="balance-value">Rp{user.balance.toLocaleString('id-ID', { minimumFractionDigits: 0 })}</span>
             </div>
             <div className="balance-item">
               <span className="balance-label">Bonus</span>
-              <span className="balance-value bonus">₹{user.bonusBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              <span className="balance-value bonus">Rp{user.bonusBalance.toLocaleString('id-ID', { minimumFractionDigits: 0 })}</span>
             </div>
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function UserDetailPage() {
                 <tr key={tx.id}>
                   <td>{tx.id}</td>
                   <td style={{ textTransform: 'capitalize' }}>{tx.type}</td>
-                  <td style={{ fontWeight: 600 }}>₹{tx.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  <td style={{ fontWeight: 600 }}>Rp{tx.amount.toLocaleString('id-ID', { minimumFractionDigits: 0 })}</td>
                   <td>
                     <span className={`status-badge-inline ${tx.status}`}>{tx.status}</span>
                   </td>

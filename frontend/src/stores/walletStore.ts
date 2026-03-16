@@ -32,7 +32,7 @@ export const useWalletStore = create<WalletState>((set) => ({
   balance: 0,
   bonusBalance: 0,
   frozenAmount: 0,
-  currency: 'INR',
+  currency: 'IDR',
   paymentMethods: [],
   transactions: [],
   transactionTotal: 0,

@@ -26,12 +26,12 @@ export default function WithdrawPage() {
 
   const handleWithdraw = async () => {
     const num = parseFloat(amount);
-    if (!num || num < 200) {
-      setError('Minimum withdrawal amount is ₹200');
+    if (!num || num < 50000) {
+      setError('Minimum withdrawal amount is Rp50.000');
       return;
     }
-    if (num > 50000) {
-      setError('Maximum withdrawal amount is ₹50,000');
+    if (num > 50000000) {
+      setError('Maximum withdrawal amount is Rp50.000.000');
       return;
     }
     if (num > balance) {
@@ -82,8 +82,8 @@ export default function WithdrawPage() {
             <AmountInput value={amount} onChange={(v) => { setAmount(v); setError(''); }} />
           </div>
           <div className="flex justify-between mb-6">
-            <p className="text-txt-muted text-xs">Minimum: ₹200</p>
-            <p className="text-txt-muted text-xs">Maximum: ₹50,000</p>
+            <p className="text-txt-muted text-xs">Minimum: Rp50.000</p>
+            <p className="text-txt-muted text-xs">Maximum: Rp50.000.000</p>
           </div>
 
           {/* Payment method tabs */}

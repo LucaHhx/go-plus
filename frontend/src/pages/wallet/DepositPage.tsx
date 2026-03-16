@@ -38,14 +38,14 @@ export default function DepositPage() {
   const handleAmountChange = (val: string) => {
     setAmount(val);
     const num = parseFloat(val);
-    setQuickAmount([100, 500, 1000, 5000].includes(num) ? num : null);
+    setQuickAmount([10000, 50000, 100000, 500000].includes(num) ? num : null);
     setError('');
   };
 
   const handleDeposit = async () => {
     const num = parseFloat(amount);
-    if (!num || num < 100) {
-      setError('Minimum deposit amount is ₹100');
+    if (!num || num < 10000) {
+      setError('Minimum deposit amount is Rp10.000');
       return;
     }
     setSubmitting(true);
@@ -97,7 +97,7 @@ export default function DepositPage() {
           <div className="mb-2">
             <AmountInput value={amount} onChange={handleAmountChange} />
           </div>
-          <p className="text-txt-muted text-xs mb-4">Minimum: ₹100</p>
+          <p className="text-txt-muted text-xs mb-4">Minimum: Rp10.000</p>
 
           <div className="mb-6">
             <QuickAmountButtons selected={quickAmount} onSelect={handleQuickAmount} />

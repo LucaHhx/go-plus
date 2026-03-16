@@ -68,7 +68,7 @@ export default function SettingsPage() {
         <h2 className="page-title">System Settings</h2>
       </div>
       <div className="card" style={{ maxWidth: 560 }}>
-        <div className="card-header"><span className="card-title">Payment Limits (INR)</span></div>
+        <div className="card-header"><span className="card-title">Payment Limits (IDR)</span></div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <FormInput
             label="Minimum Deposit"

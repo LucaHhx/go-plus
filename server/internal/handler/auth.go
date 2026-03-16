@@ -41,7 +41,7 @@ func (h *AuthHandler) SendOTP(c *gin.Context) {
 	}
 
 	if !validatePhone(req.Phone) {
-		response.Error(c, response.CodeValidationError, "Phone number must be in +91XXXXXXXXXX format")
+		response.Error(c, response.CodeValidationError, "Phone number must be in +62XXXXXXXXXX format")
 		return
 	}
 
@@ -67,7 +67,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 
 	// 校验手机号格式
 	if !validatePhone(req.Phone) {
-		response.Error(c, response.CodeValidationError, "Phone number must be in +91XXXXXXXXXX format")
+		response.Error(c, response.CodeValidationError, "Phone number must be in +62XXXXXXXXXX format")
 		return
 	}
 
@@ -124,7 +124,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	if !validatePhone(req.Phone) {
-		response.Error(c, response.CodeValidationError, "Phone number must be in +91XXXXXXXXXX format")
+		response.Error(c, response.CodeValidationError, "Phone number must be in +62XXXXXXXXXX format")
 		return
 	}
 
@@ -165,7 +165,7 @@ func (h *AuthHandler) LoginOTP(c *gin.Context) {
 	}
 
 	if !validatePhone(req.Phone) {
-		response.Error(c, response.CodeValidationError, "Phone number must be in +91XXXXXXXXXX format")
+		response.Error(c, response.CodeValidationError, "Phone number must be in +62XXXXXXXXXX format")
 		return
 	}
 

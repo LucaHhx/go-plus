@@ -16,10 +16,10 @@ interface Props {
 function BetRow({ row }: { row: BetRecord }) {
   const isProfit = row.profit > 0;
   const profitStr = isProfit
-    ? `+${row.currency || '\u20B9'} ${Math.abs(row.profit)}`
+    ? `+${row.currency || 'Rp'} ${Math.abs(row.profit).toLocaleString('id-ID')}`
     : row.profit === 0
     ? '0'
-    : `-${row.currency || '\u20B9'} ${Math.abs(row.profit)}`;
+    : `-${row.currency || 'Rp'} ${Math.abs(row.profit).toLocaleString('id-ID')}`;
 
   return (
     <div

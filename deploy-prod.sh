@@ -9,12 +9,13 @@ SSH_PORT=2220
 REMOTE_DIR="/root/go-plus"
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DOMAIN="pgplay.games"
+IMAGE_NAME="go-plus-server"
+IMAGE_TAR="/tmp/${IMAGE_NAME}.tar.gz"
 
 SSH_CMD="ssh -i $SSH_KEY -p $SSH_PORT $SSH_USER@$SSH_HOST"
-SCP_CMD="scp -i $SSH_KEY -P $SSH_PORT"
 
 echo "========================================="
-echo "  GO PLUS 正式服部署脚本"
+echo "  GO PLUS 正式服部署脚本（本地编译模式）"
 echo "  域名: $DOMAIN"
 echo "========================================="
 
@@ -30,41 +31,49 @@ echo "[2/6] 构建 admin（base=/admin/）..."
 cd "$PROJECT_DIR/admin"
 npx vite build --base /admin/
 
-# ============ 3. 同步项目文件到远程 ============
+# ============ 3. 本地构建 Docker 镜像 ============
 echo ""
-echo "[3/6] 同步项目文件到远程服务器..."
+echo "[3/6] 本地构建 Docker 镜像（目标: linux/amd64）..."
+cd "$PROJECT_DIR"
+docker buildx build \
+  --platform linux/amd64 \
+  --load \
+  -t "$IMAGE_NAME:latest" \
+  ./server
+
+echo "  镜像构建完成，导出中..."
+docker save "$IMAGE_NAME:latest" | gzip > "$IMAGE_TAR"
+echo "  镜像大小: $(du -h "$IMAGE_TAR" | cut -f1)"
+
+# ============ 4. 上传镜像 + 前端文件到服务器 ============
+echo ""
+echo "[4/6] 上传镜像和前端文件到服务器..."
 $SSH_CMD "mkdir -p $REMOTE_DIR"
 
-rsync -avz --delete \
-  --exclude 'node_modules' \
-  --exclude '.git' \
-  --exclude '.claude' \
-  --exclude 'server/server' \
-  --exclude 'server/logs' \
-  --exclude 'test-results' \
-  --exclude 'docs' \
-  --exclude 'img.png' \
-  --exclude 'deploy.sh' \
-  --exclude 'deploy-prod.sh' \
+# 并行上传：镜像 + 前端文件 + nginx 配置
+rsync -avz --progress \
   -e "ssh -i $SSH_KEY -p $SSH_PORT" \
-  "$PROJECT_DIR/" "$SSH_USER@$SSH_HOST:$REMOTE_DIR/"
+  "$IMAGE_TAR" "$SSH_USER@$SSH_HOST:/tmp/"
 
-# ============ 4. 部署前端静态文件 ============
-echo ""
-echo "[4/6] 部署前端静态文件到 /srv/www/go-plus/..."
-$SSH_CMD "
-  mkdir -p /srv/www/go-plus/frontend
-  mkdir -p /srv/www/go-plus/admin
+rsync -avz --delete \
+  -e "ssh -i $SSH_KEY -p $SSH_PORT" \
+  "$PROJECT_DIR/frontend/dist/" "$SSH_USER@$SSH_HOST:/srv/www/go-plus/frontend/"
 
-  # 同步前端构建产物
-  rm -rf /srv/www/go-plus/frontend/*
-  cp -r $REMOTE_DIR/frontend/dist/* /srv/www/go-plus/frontend/
+rsync -avz --delete \
+  -e "ssh -i $SSH_KEY -p $SSH_PORT" \
+  "$PROJECT_DIR/admin/dist/" "$SSH_USER@$SSH_HOST:/srv/www/go-plus/admin/"
 
-  rm -rf /srv/www/go-plus/admin/*
-  cp -r $REMOTE_DIR/admin/dist/* /srv/www/go-plus/admin/
-"
+# 上传 nginx 配置和 docker-compose
+rsync -avz \
+  -e "ssh -i $SSH_KEY -p $SSH_PORT" \
+  "$PROJECT_DIR/nginx.prod.conf" \
+  "$PROJECT_DIR/docker-compose.prod.yml" \
+  "$SSH_USER@$SSH_HOST:$REMOTE_DIR/"
 
-# ============ 5. 签发 SSL 证书并配置 nginx ============
+# 清理本地临时文件
+rm -f "$IMAGE_TAR"
+
+# ============ 5. 配置 nginx ============
 echo ""
 echo "[5/6] 检查 SSL 证书并配置 nginx..."
 $SSH_CMD "
@@ -96,17 +105,24 @@ $SSH_CMD "
   echo 'nginx 配置已重载'
 "
 
-# ============ 6. 启动后端服务 ============
+# ============ 6. 加载镜像并启动服务 ============
 echo ""
-echo "[6/6] 启动后端服务..."
+echo "[6/6] 加载镜像并启动后端服务..."
 $SSH_CMD "
   cd $REMOTE_DIR
+
+  # 加载镜像（无需编译）
+  echo '加载 Docker 镜像...'
+  docker load < /tmp/${IMAGE_NAME}.tar.gz
+  rm -f /tmp/${IMAGE_NAME}.tar.gz
 
   # 停止旧容器
   docker-compose -f docker-compose.prod.yml down 2>/dev/null || true
 
-  # 构建并启动
-  docker-compose -f docker-compose.prod.yml up -d --build
+  # 直接启动（不需要 --build）
+  docker-compose -f docker-compose.prod.yml up -d
+
+  echo '服务已启动'
 "
 
 echo ""

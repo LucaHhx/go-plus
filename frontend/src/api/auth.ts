@@ -1,9 +1,9 @@
 import { post, get } from './client';
 import type { AuthResponse, RegisterRequest, User } from '@/types';
 
-/** Ensure phone number has +91 prefix for backend validation */
+/** Ensure phone number has +62 prefix for backend validation */
 const withCountryCode = (phone: string) =>
-  phone.startsWith('+91') ? phone : `+91${phone}`;
+  phone.startsWith('+62') ? phone : `+62${phone}`;
 
 export const authApi = {
   sendOTP: (phone: string, purpose: string) =>

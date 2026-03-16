@@ -13,11 +13,11 @@ import (
 )
 
 var (
-	ErrDepositBelowMin    = errors.New("deposit amount below minimum")
-	ErrDepositAboveMax    = errors.New("deposit amount above maximum")
-	ErrWithdrawBelowMin   = errors.New("withdrawal amount below minimum")
-	ErrWithdrawAboveMax   = errors.New("withdrawal amount exceeds available balance")
-	ErrWalletNotFound     = errors.New("wallet not found")
+	ErrDepositBelowMin       = errors.New("deposit amount below minimum")
+	ErrDepositAboveMax       = errors.New("deposit amount above maximum")
+	ErrWithdrawBelowMin      = errors.New("withdrawal amount below minimum")
+	ErrWithdrawAboveMax      = errors.New("withdrawal amount exceeds available balance")
+	ErrWalletNotFound        = errors.New("wallet not found")
 	ErrPaymentMethodNotFound = errors.New("payment method not available")
 	ErrTransactionNotFound   = errors.New("transaction not found")
 )
@@ -208,9 +208,9 @@ func (s *WalletService) Withdraw(userID uint, amount float64, paymentMethodCode 
 		return nil, err
 	}
 
-	// 提现最低 200 INR，最高 50,000 INR (plan.md 范围定义)
-	minWithdraw := 200.0
-	maxWithdraw := 50000.0
+	// 提现最低 50,000 IDR，最高 50,000,000 IDR
+	minWithdraw := 50000.0
+	maxWithdraw := 50000000.0
 	if amount < minWithdraw {
 		return nil, ErrWithdrawBelowMin
 	}

@@ -1,4 +1,4 @@
-const QUICK_AMOUNTS = [100, 500, 1000, 5000];
+const QUICK_AMOUNTS = [10000, 50000, 100000, 500000];
 
 interface QuickAmountButtonsProps {
   selected: number | null;
@@ -21,7 +21,7 @@ export default function QuickAmountButtons({ selected, onSelect }: QuickAmountBu
                 : 'bg-bg-card border border-divider text-txt-secondary font-semibold hover:bg-bg-hover hover:text-txt'
             }`}
           >
-            ₹{amount.toLocaleString('en-IN')}
+            Rp{amount.toLocaleString('id-ID')}
           </button>
         );
       })}

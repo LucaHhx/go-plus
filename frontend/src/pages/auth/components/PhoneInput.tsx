@@ -11,7 +11,7 @@ interface PhoneInputProps {
 const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
   ({ value, onChange, error, placeholder = 'Phone Number', disabled }, ref) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const raw = e.target.value.replace(/\D/g, '').slice(0, 10);
+      const raw = e.target.value.replace(/\D/g, '').slice(0, 12);
       onChange(raw);
     };
 
@@ -51,7 +51,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
               height: '24px',
             }}
           >
-            +91
+            +62
           </span>
           <input
             ref={ref}

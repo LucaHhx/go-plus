@@ -1,8 +1,6 @@
 services:
   server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    image: go-plus-server:latest
     restart: unless-stopped
     ports:
       - "9001:8080"

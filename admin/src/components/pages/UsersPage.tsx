@@ -18,11 +18,11 @@ interface User {
 }
 
 const mockUsers: User[] = [
-  { id: '1001', phone: '+91 98765 43210', nickname: 'player1', createdAt: '2026-03-04', balance: 1250, bonusBalance: 100, status: 'active' },
-  { id: '1002', phone: '+91 87654 32109', nickname: 'player2', createdAt: '2026-03-03', balance: 500, bonusBalance: 50, status: 'active' },
-  { id: '1003', phone: '+91 76543 21098', nickname: 'player3', createdAt: '2026-03-02', balance: 0, bonusBalance: 0, status: 'disabled' },
-  { id: '1004', phone: '+91 65432 10987', nickname: 'player4', createdAt: '2026-03-01', balance: 3200, bonusBalance: 200, status: 'active' },
-  { id: '1005', phone: '+91 54321 09876', nickname: 'player5', createdAt: '2026-02-28', balance: 800, bonusBalance: 80, status: 'active' },
+  { id: '1001', phone: '+62 98765 43210', nickname: 'player1', createdAt: '2026-03-04', balance: 1250, bonusBalance: 100, status: 'active' },
+  { id: '1002', phone: '+62 87654 32109', nickname: 'player2', createdAt: '2026-03-03', balance: 500, bonusBalance: 50, status: 'active' },
+  { id: '1003', phone: '+62 76543 21098', nickname: 'player3', createdAt: '2026-03-02', balance: 0, bonusBalance: 0, status: 'disabled' },
+  { id: '1004', phone: '+62 65432 10987', nickname: 'player4', createdAt: '2026-03-01', balance: 3200, bonusBalance: 200, status: 'active' },
+  { id: '1005', phone: '+62 54321 09876', nickname: 'player5', createdAt: '2026-02-28', balance: 800, bonusBalance: 80, status: 'active' },
 ];
 
 export default function UsersPage() {
@@ -68,7 +68,7 @@ export default function UsersPage() {
     { key: 'id', title: 'ID', render: u => `#${u.id}` },
     { key: 'phone', title: 'Phone' },
     { key: 'createdAt', title: 'Registered', render: u => u.createdAt?.slice(0, 10) || '--' },
-    { key: 'balance', title: 'Balance', render: u => `₹${u.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` },
+    { key: 'balance', title: 'Balance', render: u => `Rp${u.balance.toLocaleString('id-ID', { minimumFractionDigits: 0 })}` },
     { key: 'status', title: 'Status', render: u => <StatusBadge status={u.status} /> },
     {
       key: 'actions', title: 'Actions', render: u => (

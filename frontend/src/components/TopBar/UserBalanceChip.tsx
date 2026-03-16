@@ -8,14 +8,14 @@ export default function UserBalanceChip() {
   if (!user) return null;
 
   const totalBalance = (user.balance + user.bonus_balance).toLocaleString(
-    'en-IN'
+    'id-ID'
   );
 
   return (
     <div className="flex items-center gap-2">
       <div className="flex items-center h-10 rounded-lg px-3 bg-bg-card border border-divider">
         <span className="text-white text-sm font-semibold">
-          ₹{totalBalance}
+          Rp{totalBalance}
         </span>
       </div>
       <button

@@ -143,7 +143,7 @@ export default function TransactionCard({ transaction: tx }: TransactionCardProp
       </div>
       <div className="text-right flex-shrink-0">
         <p className={`${config.amountColor} text-sm font-bold`}>
-          {config.prefix}₹{tx.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          {config.prefix}Rp{tx.amount.toLocaleString('id-ID', { minimumFractionDigits: 0 })}
         </p>
         {statusLabel && (
           <span className={`inline-block ${getStatusStyle(tx)} text-[10px] font-bold px-1.5 py-0.5 rounded`}>

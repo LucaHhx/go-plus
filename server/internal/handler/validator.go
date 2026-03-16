@@ -4,9 +4,9 @@ import (
 	"regexp"
 )
 
-var phoneRegex = regexp.MustCompile(`^\+91\d{10}$`)
+var phoneRegex = regexp.MustCompile(`^\+62\d{9,12}$`)
 
-// validatePhone 验证手机号格式 (+91XXXXXXXXXX)
+// validatePhone 验证手机号格式 (+62XXXXXXXXX ~ +62XXXXXXXXXXXX)
 func validatePhone(phone string) bool {
 	return phoneRegex.MatchString(phone)
 }

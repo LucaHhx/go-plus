@@ -141,7 +141,7 @@ type LatestBetsData struct {
 // HomeResponse 首页聚合响应
 type HomeResponse struct {
 	// 一期全功能字段
-	Banners      []model.BannerResponse      `json:"banners"`
+	Banners      []model.BannerResponse       `json:"banners"`
 	GameSections []GameSectionResponse        `json:"game_sections"`
 	PaymentIcons []IconItem                   `json:"payment_icons"`
 	Providers    []model.GameProviderResponse `json:"providers"`
@@ -345,7 +345,7 @@ func mockJackpot() JackpotData {
 			Username:  "Player***89",
 			BetAmount: 1000.00,
 			WinAmount: 50000.00,
-			Currency:  "INR",
+			Currency:  "Rp",
 		},
 		MyTurnover: 0.00,
 	}
@@ -394,40 +394,40 @@ func mockOneGoSelection() OneGoSelection {
 func mockLatestBets() LatestBetsData {
 	return LatestBetsData{
 		LatestBet: []BetRecord{
-			{Game: "Blackjack", GameInitial: "B", Player: "Player***12", Profit: 3.20, Currency: "INR"},
-			{Game: "Aviator", GameInitial: "A", Player: "Player***34", Profit: 15.50, Currency: "INR"},
-			{Game: "Fortune Gems 3", GameInitial: "F", Player: "Player***56", Profit: -5.00, Currency: "INR"},
-			{Game: "TeenPatti", GameInitial: "T", Player: "Player***78", Profit: 8.00, Currency: "INR"},
-			{Game: "Rummy", GameInitial: "R", Player: "Player***90", Profit: -2.30, Currency: "INR"},
-			{Game: "Dragon Tiger", GameInitial: "D", Player: "Player***11", Profit: 12.00, Currency: "INR"},
-			{Game: "Mines", GameInitial: "M", Player: "Player***22", Profit: 25.00, Currency: "INR"},
-			{Game: "Baccarat", GameInitial: "B", Player: "Player***33", Profit: -10.00, Currency: "INR"},
-			{Game: "Plinko", GameInitial: "P", Player: "Player***44", Profit: 7.50, Currency: "INR"},
-			{Game: "Sic Bo", GameInitial: "S", Player: "Player***55", Profit: 4.00, Currency: "INR"},
+			{Game: "Blackjack", GameInitial: "B", Player: "Player***12", Profit: 3.20, Currency: "Rp"},
+			{Game: "Aviator", GameInitial: "A", Player: "Player***34", Profit: 15.50, Currency: "Rp"},
+			{Game: "Fortune Gems 3", GameInitial: "F", Player: "Player***56", Profit: -5.00, Currency: "Rp"},
+			{Game: "TeenPatti", GameInitial: "T", Player: "Player***78", Profit: 8.00, Currency: "Rp"},
+			{Game: "Rummy", GameInitial: "R", Player: "Player***90", Profit: -2.30, Currency: "Rp"},
+			{Game: "Dragon Tiger", GameInitial: "D", Player: "Player***11", Profit: 12.00, Currency: "Rp"},
+			{Game: "Mines", GameInitial: "M", Player: "Player***22", Profit: 25.00, Currency: "Rp"},
+			{Game: "Baccarat", GameInitial: "B", Player: "Player***33", Profit: -10.00, Currency: "Rp"},
+			{Game: "Plinko", GameInitial: "P", Player: "Player***44", Profit: 7.50, Currency: "Rp"},
+			{Game: "Sic Bo", GameInitial: "S", Player: "Player***55", Profit: 4.00, Currency: "Rp"},
 		},
 		HighRoller: []BetRecord{
-			{Game: "Roulette", GameInitial: "R", Player: "Player***45", Profit: 150.00, Currency: "INR"},
-			{Game: "Blackjack", GameInitial: "B", Player: "Player***67", Profit: 280.00, Currency: "INR"},
-			{Game: "Baccarat", GameInitial: "B", Player: "Player***89", Profit: -120.00, Currency: "INR"},
-			{Game: "Dragon Tiger", GameInitial: "D", Player: "Player***01", Profit: 450.00, Currency: "INR"},
-			{Game: "TeenPatti", GameInitial: "T", Player: "Player***23", Profit: 320.00, Currency: "INR"},
-			{Game: "Aviator", GameInitial: "A", Player: "Player***45", Profit: 580.00, Currency: "INR"},
-			{Game: "Fortune Gems 3", GameInitial: "F", Player: "Player***67", Profit: -200.00, Currency: "INR"},
-			{Game: "Andar Bahar", GameInitial: "A", Player: "Player***89", Profit: 175.00, Currency: "INR"},
-			{Game: "Sic Bo", GameInitial: "S", Player: "Player***01", Profit: 95.00, Currency: "INR"},
-			{Game: "Rummy", GameInitial: "R", Player: "Player***23", Profit: 210.00, Currency: "INR"},
+			{Game: "Roulette", GameInitial: "R", Player: "Player***45", Profit: 150.00, Currency: "Rp"},
+			{Game: "Blackjack", GameInitial: "B", Player: "Player***67", Profit: 280.00, Currency: "Rp"},
+			{Game: "Baccarat", GameInitial: "B", Player: "Player***89", Profit: -120.00, Currency: "Rp"},
+			{Game: "Dragon Tiger", GameInitial: "D", Player: "Player***01", Profit: 450.00, Currency: "Rp"},
+			{Game: "TeenPatti", GameInitial: "T", Player: "Player***23", Profit: 320.00, Currency: "Rp"},
+			{Game: "Aviator", GameInitial: "A", Player: "Player***45", Profit: 580.00, Currency: "Rp"},
+			{Game: "Fortune Gems 3", GameInitial: "F", Player: "Player***67", Profit: -200.00, Currency: "Rp"},
+			{Game: "Andar Bahar", GameInitial: "A", Player: "Player***89", Profit: 175.00, Currency: "Rp"},
+			{Game: "Sic Bo", GameInitial: "S", Player: "Player***01", Profit: 95.00, Currency: "Rp"},
+			{Game: "Rummy", GameInitial: "R", Player: "Player***23", Profit: 210.00, Currency: "Rp"},
 		},
 		HighMultiplier: []BetRecord{
-			{Game: "Aviator", GameInitial: "A", Player: "Player***78", Profit: 0, Currency: "INR"},
-			{Game: "Plinko", GameInitial: "P", Player: "Player***90", Profit: 500.00, Currency: "INR"},
-			{Game: "Mines", GameInitial: "M", Player: "Player***12", Profit: 350.00, Currency: "INR"},
-			{Game: "JetX", GameInitial: "J", Player: "Player***34", Profit: 420.00, Currency: "INR"},
-			{Game: "Chicken Road 2", GameInitial: "C", Player: "Player***56", Profit: 280.00, Currency: "INR"},
-			{Game: "Hi-Lo", GameInitial: "H", Player: "Player***78", Profit: 150.00, Currency: "INR"},
-			{Game: "Dice", GameInitial: "D", Player: "Player***90", Profit: 620.00, Currency: "INR"},
-			{Game: "Goal", GameInitial: "G", Player: "Player***12", Profit: 180.00, Currency: "INR"},
-			{Game: "Fortune Gems 3", GameInitial: "F", Player: "Player***34", Profit: 750.00, Currency: "INR"},
-			{Game: "Cash Mania", GameInitial: "C", Player: "Player***56", Profit: 310.00, Currency: "INR"},
+			{Game: "Aviator", GameInitial: "A", Player: "Player***78", Profit: 0, Currency: "Rp"},
+			{Game: "Plinko", GameInitial: "P", Player: "Player***90", Profit: 500.00, Currency: "Rp"},
+			{Game: "Mines", GameInitial: "M", Player: "Player***12", Profit: 350.00, Currency: "Rp"},
+			{Game: "JetX", GameInitial: "J", Player: "Player***34", Profit: 420.00, Currency: "Rp"},
+			{Game: "Chicken Road 2", GameInitial: "C", Player: "Player***56", Profit: 280.00, Currency: "Rp"},
+			{Game: "Hi-Lo", GameInitial: "H", Player: "Player***78", Profit: 150.00, Currency: "Rp"},
+			{Game: "Dice", GameInitial: "D", Player: "Player***90", Profit: 620.00, Currency: "Rp"},
+			{Game: "Goal", GameInitial: "G", Player: "Player***12", Profit: 180.00, Currency: "Rp"},
+			{Game: "Fortune Gems 3", GameInitial: "F", Player: "Player***34", Profit: 750.00, Currency: "Rp"},
+			{Game: "Cash Mania", GameInitial: "C", Player: "Player***56", Profit: 310.00, Currency: "Rp"},
 		},
 	}
 }

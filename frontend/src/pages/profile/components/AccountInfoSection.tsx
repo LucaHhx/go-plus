@@ -1,12 +1,12 @@
 import { useAuthStore } from '@/stores/authStore';
 
-/** Format phone: +91****7890 */
+/** Format phone: +62****7890 */
 function maskPhone(phone: string) {
   if (!phone) return '-';
-  // Remove +91 prefix, mask middle digits
-  const digits = phone.replace(/^\+91/, '');
+  // Remove +62 prefix, mask middle digits
+  const digits = phone.replace(/^\+62/, '');
   if (digits.length <= 4) return phone;
-  return `+91${'*'.repeat(digits.length - 4)}${digits.slice(-4)}`;
+  return `+62${'*'.repeat(digits.length - 4)}${digits.slice(-4)}`;
 }
 
 function formatDate(dateStr: string) {

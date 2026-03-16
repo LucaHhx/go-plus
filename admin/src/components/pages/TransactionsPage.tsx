@@ -54,7 +54,7 @@ export default function TransactionsPage() {
   const columns: Column<Transaction>[] = [
     { key: 'id', title: 'ID' },
     { key: 'userId', title: 'User ID' },
-    { key: 'amount', title: 'Amount', render: tx => <span style={{ fontWeight: 700 }}>₹{tx.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span> },
+    { key: 'amount', title: 'Amount', render: tx => <span style={{ fontWeight: 700 }}>Rp{tx.amount.toLocaleString('id-ID', { minimumFractionDigits: 0 })}</span> },
     { key: 'paymentMethod', title: 'Method' },
     { key: 'status', title: 'Status', render: tx => <StatusBadge status={tx.status} /> },
     { key: 'createdAt', title: 'Time', render: tx => <span style={{ color: '#64748b' }}>{tx.createdAt}</span> },
