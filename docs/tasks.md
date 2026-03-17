@@ -17,6 +17,7 @@
 | 6 | 管理后台 (admin-panel) | 待办 | 全功能 | 全功能 | 用户/游戏/交易/Banner管理 |
 | 7 | 用户管理 (user-management) | 待办 | 全功能 | 全功能 | 登出入口/个人资料/安全设置 |
 | 8 | 版本更新日志 (version-changelog) | 待办 | 全功能 | 全功能 | 后台Markdown编辑/前端版本日志展示 |
+| 9 | 手机端适配优化 (mobile-responsive) | 待办 | 全功能 | — | 导航栏固定/内容区独立滚动/多分辨率兼容 |
 
 ### 第一期 mock 组件明细
 
@@ -40,10 +41,10 @@
 
 | # | 需求 | 状态 | 备注 |
 |---|------|------|------|
-| 9 | 促销活动 (promotion) | 待办 | 注册奖励/首充返现/每日礼物/礼品码 |
-| 10 | VIP 俱乐部 (vip-club) | 待办 | 等级体系/XP/每日返现/升级礼物 |
-| 11 | 奖池系统 (jackpot) | 待办 | 替换 mock → 真实 Daily Jackpot/VIP Money Pot |
-| 12 | 实时投注动态 (live-betting) | 待办 | 替换 mock → 真实 Latest Bet/High Roller/High Multiplier |
+| 10 | 促销活动 (promotion) | 待办 | 注册奖励/首充返现/每日礼物/礼品码 |
+| 11 | VIP 俱乐部 (vip-club) | 待办 | 等级体系/XP/每日返现/升级礼物 |
+| 12 | 奖池系统 (jackpot) | 待办 | 替换 mock → 真实 Daily Jackpot/VIP Money Pot |
+| 13 | 实时投注动态 (live-betting) | 待办 | 替换 mock → 真实 Latest Bet/High Roller/High Multiplier |
 
 ## 第三期 — 裂变与生态
 
@@ -51,7 +52,7 @@
 
 | # | 需求 | 状态 | 备注 |
 |---|------|------|------|
-| 13 | 推广系统 (affiliate) | 待办 | 团队佣金/推荐奖励/分享 |
-| 14 | 抽奖系统 (raffle) | 待办 | 替换占位 → 完整选号/开奖/每日票奖励 |
-| 15 | 任务系统 (quest) | 待办 | 替换占位 → 完整多任务/奖励 |
-| 16 | 幸运转盘 (lucky-wheel) | 待办 | 替换占位 → GET 1700/邀请宝箱 |
+| 14 | 推广系统 (affiliate) | 待办 | 团队佣金/推荐奖励/分享 |
+| 15 | 抽奖系统 (raffle) | 待办 | 替换占位 → 完整选号/开奖/每日票奖励 |
+| 16 | 任务系统 (quest) | 待办 | 替换占位 → 完整多任务/奖励 |
+| 17 | 幸运转盘 (lucky-wheel) | 待办 | 替换占位 → GET 1700/邀请宝箱 |
