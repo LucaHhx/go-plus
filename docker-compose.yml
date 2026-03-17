@@ -1,11 +1,15 @@
 services:
   server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    image: alpine:latest
     restart: unless-stopped
+    working_dir: /app
+    command: ["./server", "-config", "config.yaml"]
     volumes:
+      - ./server/server-linux:/app/server:ro
+      - ./server/config.production.yaml:/app/config.yaml:ro
+      - ./server/assets:/app/assets:ro
       - ./server/data:/app/data
+      - ./server/logs:/app/logs
     networks:
       - app-network
 

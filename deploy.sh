@@ -14,31 +14,45 @@ SSH_CMD="ssh -i $SSH_KEY -p $SSH_PORT $SSH_USER@$SSH_HOST"
 REMOTE_ENV="export PATH=/usr/local/bin:/opt/homebrew/bin:\$PATH"
 
 echo "========================================="
-echo "  GO PLUS 部署脚本"
+echo "  GO PLUS 部署脚本（本地编译模式）"
 echo "========================================="
 
 # ============ 1. 构建前端 ============
 echo ""
-echo "[1/4] 构建 frontend..."
+echo "[1/5] 构建 frontend..."
 cd "$PROJECT_DIR/frontend"
 npm run build
 
 # ============ 2. 构建管理后台 ============
 echo ""
-echo "[2/4] 构建 admin（base=/admin/）..."
+echo "[2/5] 构建 admin（base=/admin/）..."
 cd "$PROJECT_DIR/admin"
 npx vite build --base /admin/
 
-# ============ 3. 同步文件到远程 ============
+# ============ 3. 本地编译 Go 后端（Linux 二进制） ============
 echo ""
-echo "[3/4] 同步文件到远程服务器..."
-$SSH_CMD "mkdir -p $REMOTE_DIR"
+echo "[3/5] 本地编译 Go 后端（目标: linux/arm64）..."
+cd "$PROJECT_DIR/server"
+
+docker run --rm \
+  -v "$PROJECT_DIR/server":/app \
+  -w /app \
+  golang:1.25-alpine \
+  sh -c "apk add --no-cache gcc musl-dev sqlite-dev sqlite-static && CGO_ENABLED=1 go build -ldflags '-linkmode external -extldflags \"-static\"' -o server-linux ./cmd/server"
+
+echo "  编译完成: server/server-linux"
+
+# ============ 4. 同步文件到远程 ============
+echo ""
+echo "[4/5] 同步文件到远程服务器..."
+$SSH_CMD "mkdir -p $REMOTE_DIR/server/data $REMOTE_DIR/server/logs"
 
 rsync -avz --delete \
   --exclude 'node_modules' \
   --exclude '.git' \
   --exclude '.claude' \
   --exclude 'server/server' \
+  --exclude 'server/server-linux' \
   --exclude 'server/logs' \
   --exclude 'test-results' \
   --exclude 'docs' \
@@ -47,9 +61,14 @@ rsync -avz --delete \
   -e "ssh -i $SSH_KEY -p $SSH_PORT" \
   "$PROJECT_DIR/" "$SSH_USER@$SSH_HOST:$REMOTE_DIR/"
 
-# ============ 4. 远程构建并启动 ============
+# 单独同步编译好的二进制文件
+rsync -avz \
+  -e "ssh -i $SSH_KEY -p $SSH_PORT" \
+  "$PROJECT_DIR/server/server-linux" "$SSH_USER@$SSH_HOST:$REMOTE_DIR/server/server-linux"
+
+# ============ 5. 远程启动容器 ============
 echo ""
-echo "[4/4] 远程 docker-compose 构建并启动（端口 $APP_PORT）..."
+echo "[5/5] 远程启动容器（端口 $APP_PORT）..."
 $SSH_CMD "
   $REMOTE_ENV
   cd $REMOTE_DIR
@@ -58,9 +77,12 @@ $SSH_CMD "
   # 停止旧容器（如果存在）
   docker compose down 2>/dev/null || true
 
-  # 构建并启动
-  docker compose up -d --build
+  # 直接启动（无需构建）
+  docker compose up -d
 "
+
+# 清理本地编译产物
+rm -f "$PROJECT_DIR/server/server-linux"
 
 echo ""
 echo "========================================="
