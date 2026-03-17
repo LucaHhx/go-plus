@@ -74,6 +74,7 @@ body {
   width: 100%;
   min-height: 100dvh;
   background: var(--color-bg-deep);
+  overscroll-behavior: none;
 }
 
 body {
@@ -256,4 +257,15 @@ input::placeholder {
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
+}
+
+/* Safe area helper classes */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* dvh fallback for older browsers */
+@supports not (height: 100dvh) {
+  .h-dvh-fallback { height: 100vh; }
+  .min-h-dvh-fallback { min-height: 100vh; }
 }

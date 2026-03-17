@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import FullScreenLayout from '@/components/layout/FullScreenLayout';
 import AuthHeader from './components/AuthHeader';
 import AuthBanner from './components/AuthBanner';
 import PhoneInput from './components/PhoneInput';
@@ -132,11 +133,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div
-      className="min-h-screen flex justify-center"
-      style={{ background: '#1A1D1D' }}
-    >
-    <div className="w-full max-w-[430px] min-h-screen" style={{ background: '#232626' }}>
+    <FullScreenLayout>
       <AuthHeader />
       <AuthBanner variant="signup" />
 
@@ -354,7 +351,6 @@ export default function RegisterPage() {
           </Link>
         </div>
       </form>
-    </div>
-    </div>
+    </FullScreenLayout>
   );
 }

@@ -31,7 +31,7 @@ export default function GamePlayPage() {
   }, [id]);
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#1A1D1D' }}>
+    <div className="min-h-dvh flex flex-col" style={{ background: '#1A1D1D' }}>
       {/* Header with back button */}
       <div
         className="flex items-center shrink-0"

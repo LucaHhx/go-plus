@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useWalletStore } from '@/stores/walletStore';
+import FullScreenLayout from '@/components/layout/FullScreenLayout';
 import WalletPageHeader from './components/WalletPageHeader';
 import TransactionFilter from './components/TransactionFilter';
 import TransactionCard from './components/TransactionCard';
@@ -24,8 +25,7 @@ export default function TransactionsPage() {
   const hasMore = transactions.length < transactionTotal;
 
   return (
-    <div className="min-h-screen flex justify-center" style={{ background: '#1A1D1D' }}>
-      <div className="w-full max-w-[430px] min-h-screen bg-bg">
+    <FullScreenLayout>
         <WalletPageHeader title="Transactions" />
 
         <TransactionFilter selected={filter} onSelect={setFilter} />
@@ -62,7 +62,6 @@ export default function TransactionsPage() {
             </>
           )}
         </div>
-      </div>
-    </div>
+    </FullScreenLayout>
   );
 }

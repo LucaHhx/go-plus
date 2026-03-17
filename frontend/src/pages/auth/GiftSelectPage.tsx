@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import FullScreenLayout from '@/components/layout/FullScreenLayout';
 
 export default function GiftSelectPage() {
   const navigate = useNavigate();
@@ -13,8 +14,7 @@ export default function GiftSelectPage() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center" style={{ background: '#1A1D1D' }}>
-    <div className="w-full max-w-[430px] min-h-screen flex flex-col items-center justify-center px-4" style={{ background: '#232626' }}>
+    <FullScreenLayout className="items-center justify-center px-4">
       <div className="w-full">
         <h1 className="text-white font-extrabold text-2xl text-center mb-2">
           Congratulations!
@@ -120,7 +120,6 @@ export default function GiftSelectPage() {
           Skip for now
         </button>
       </div>
-    </div>
-    </div>
+    </FullScreenLayout>
   );
 }

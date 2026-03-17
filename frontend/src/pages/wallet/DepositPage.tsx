@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWalletStore } from '@/stores/walletStore';
+import FullScreenLayout from '@/components/layout/FullScreenLayout';
 import WalletPageHeader from './components/WalletPageHeader';
 import BalanceDisplay from './components/BalanceDisplay';
 import PaymentMethodSelector from './components/PaymentMethodSelector';
@@ -64,8 +65,7 @@ export default function DepositPage() {
   const depositMethods = paymentMethods.filter((m) => m.type === 'deposit' || m.type === 'both');
 
   return (
-    <div className="min-h-screen flex justify-center" style={{ background: '#1A1D1D' }}>
-      <div className="w-full max-w-[430px] min-h-screen bg-bg">
+    <FullScreenLayout>
         <WalletPageHeader
           title="Deposit"
           rightIcon={
@@ -116,7 +116,6 @@ export default function DepositPage() {
             {submitting ? 'Processing...' : 'Deposit'}
           </button>
         </div>
-      </div>
-    </div>
+    </FullScreenLayout>
   );
 }

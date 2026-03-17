@@ -22,7 +22,7 @@ export default function AuthGuard({
   // While checking auth state, show nothing (avoids flash)
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
+      <div className="min-h-dvh bg-bg flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-2 border-brand border-t-transparent rounded-full" />
       </div>
     );

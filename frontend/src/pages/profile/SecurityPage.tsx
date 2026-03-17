@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import FullScreenLayout from '@/components/layout/FullScreenLayout';
 import ProfileHeader from './components/ProfileHeader';
 import ChangePasswordForm from './components/ChangePasswordForm';
 import GoogleBindSection from './components/GoogleBindSection';
@@ -12,7 +13,7 @@ export default function SecurityPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-bg max-w-[430px] mx-auto relative">
+    <FullScreenLayout>
       <ProfileHeader title="Security Settings" />
 
       <div className="pt-4">
@@ -31,6 +32,6 @@ export default function SecurityPage() {
           onClose={() => setToast(null)}
         />
       )}
-    </div>
+    </FullScreenLayout>
   );
 }

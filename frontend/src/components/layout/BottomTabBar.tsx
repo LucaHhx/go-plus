@@ -107,8 +107,8 @@ export default function BottomTabBar() {
 
   return (
     <nav
-      className="shrink-0 z-[999] relative"
-      style={{ background: '#323738', height: '64px' }}
+      className="shrink-0 z-[999] relative pb-safe"
+      style={{ background: '#323738', minHeight: '64px' }}
     >
       <div className="flex items-end justify-around h-full px-2 pb-1">
         {tabs.map((tab) => {

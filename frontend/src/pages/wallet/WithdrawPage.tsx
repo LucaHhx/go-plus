@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWalletStore } from '@/stores/walletStore';
+import FullScreenLayout from '@/components/layout/FullScreenLayout';
 import WalletPageHeader from './components/WalletPageHeader';
 import BalanceDisplay from './components/BalanceDisplay';
 import AmountInput from './components/AmountInput';
@@ -70,8 +71,7 @@ export default function WithdrawPage() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center" style={{ background: '#1A1D1D' }}>
-      <div className="w-full max-w-[430px] min-h-screen bg-bg">
+    <FullScreenLayout>
         <WalletPageHeader title="Withdraw" />
 
         <div className="px-4 pb-8">
@@ -187,7 +187,6 @@ export default function WithdrawPage() {
             Instant Withdrawal - Get your money fast!
           </p>
         </div>
-      </div>
-    </div>
+    </FullScreenLayout>
   );
 }

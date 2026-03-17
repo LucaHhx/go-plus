@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import FullScreenLayout from '@/components/layout/FullScreenLayout';
 import ProfileHeader from './components/ProfileHeader';
 import AvatarUploader from './components/AvatarUploader';
 import NicknameEditor from './components/NicknameEditor';
@@ -16,7 +17,7 @@ export default function ProfilePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-bg max-w-[430px] mx-auto relative">
+    <FullScreenLayout>
       <ProfileHeader title="Profile" />
 
       {/* Avatar area */}
@@ -57,6 +58,6 @@ export default function ProfilePage() {
           onClose={() => setToast(null)}
         />
       )}
-    </div>
+    </FullScreenLayout>
   );
 }
